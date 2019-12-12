@@ -34,14 +34,17 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void InitializeListFunction();
+    void MyCutSong();
     int fd;
     char buf[128];
     int OpenFlag;
+    int CutSong;
 
 signals:
 
 public slots:
    void MyClickedPlaying();
+
 
    void MyVolumeSet();
 

@@ -7,6 +7,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     OpenFlag = 0;
+    CutSong = 0;
     fd = open("fifo",O_RDWR);
     if(fd < 0){
          perror("open wronly fifo");
@@ -58,8 +59,10 @@ MainWindow::MainWindow(QWidget *parent)
         write(fd,buff,128);
         //printf("%s\n",buff);
        // fflush(stdout);
+
     });
     InitializeListFunction();
+
 }
 
 MainWindow::~MainWindow()
@@ -90,7 +93,16 @@ void MainWindow::InitializeListFunction()
         write(fd,buff,128);
     }
     OpenFlag = 1;
-        closedir(dir);
+    closedir(dir);
+}
+
+void MainWindow::MyCutSong()
+{
+   char buff[128] = "";
+
+   int MyFd = open("../MySystemProject/lyrics",O_RDONLY);
+
+
 }
 
 // clicke the pause button
