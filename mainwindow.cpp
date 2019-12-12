@@ -30,7 +30,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     //list fflush button
     connect(ui->pushButton,&QPushButton::clicked,[=]{
-        DIR *dir = opendir("../MySystemProject/song");
+        DIR *dir = opendir("../MyQT_Mplayer_Project/song");
         int i = 0;
         ui->listWidget->clear();
         while (1) {
@@ -41,24 +41,25 @@ MainWindow::MainWindow(QWidget *parent)
             }
             else if(dirp->d_type == DT_REG){
                 ui->listWidget->addItem(new QListWidgetItem(dirp->d_name));
-                strcpy(buf,dirp->d_name);
+
             }
             i++;
             }
 
         OpenFlag = 1;
             closedir(dir);
+            MyCutSong();
     });
     connect(ui->listWidget,&QListWidget::doubleClicked,[=]{
 
 
-        char buff[128]= "loadfile ../MySystemProject/song/ ";
+        char buff[128]= "loadfile ../MyQT_Mplayer_Project/song/ ";
         QByteArray ba = ui->listWidget->currentItem()->text().toUtf8();
         strcpy(buf,ba.data());
         strcat(buff,buf);
         write(fd,buff,128);
-        //printf("%s\n",buff);
-       // fflush(stdout);
+        printf("%s\n",buff);
+       fflush(stdout);
 
     });
     InitializeListFunction();
@@ -72,7 +73,7 @@ MainWindow::~MainWindow()
 //the song list initialize
 void MainWindow::InitializeListFunction()
 {
-    DIR *dir = opendir("../MySystemProject/song");
+    DIR *dir = opendir("../MyQT_Mplayer_Project/song");
     int i = 0;
     ui->listWidget->clear();
     while (1) {
@@ -88,7 +89,7 @@ void MainWindow::InitializeListFunction()
         i++;
         }
     if(OpenFlag == 0){
-        char buff[128] = "mplayer  -idle  -slave  -quiet ../MySystemProject/song/";
+        char buff[128] = "mplayer  -idle  -slave  -quiet ../MyQT_Mplayer_Project/song/";
         strcat(buff,buf);
         write(fd,buff,128);
     }
@@ -99,8 +100,34 @@ void MainWindow::InitializeListFunction()
 void MainWindow::MyCutSong()
 {
    char buff[128] = "";
+   char Site[128] = "../MyQT_Mplayer_Project/lyrics/";
+   char *buff1,*buff2,*buff3,buff4[128] = {0};
+   QVectorLyric.clear();
+//   sscanf(buf,"%s.",buff4);
+   strcpy(buff4,strtok(buf,"."));
+   strcat(buff4,".lrc");
+   strcat(Site,buff4);
+   printf("%s",Site);
+   fflush(stdout);
+   FILE *MyFd;
+  if( (MyFd = fopen(Site,"r+")) == NULL){
+    perror("fopen the lyric");
+    return;
+  }
+  while(fgets(buff, sizeof(buff), MyFd) != NULL)
+      {
+          sscanf(buff,"[%s:",buff1);
+          sscanf(buff,":%s.",buff2);
+          sscanf(buff,".%s]",buff3);
+          sscanf(buff,"]%s\n",StructLyric.MyLyric);
+          StructLyric.time = atof(buff1)*60 + atof(buff2) + atof(buff3)*0.01;
+          if(atof(buff3) == 0){
+              sscanf(buff,"[%s]",StructLyric.MyLyric);
+          }
+          QVectorLyric.push_back(StructLyric);
+      }
 
-   int MyFd = open("../MySystemProject/lyrics",O_RDONLY);
+
 
 
 }

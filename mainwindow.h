@@ -21,7 +21,12 @@
 #include <stdlib.h>
 #include <QByteArray>
 #include <QDebug>
-
+#include <QVector>
+struct lyric
+{
+    double time;
+    char *MyLyric;
+};
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -39,6 +44,8 @@ public:
     char buf[128];
     int OpenFlag;
     int CutSong;
+    QVector<lyric> QVectorLyric;
+    lyric StructLyric;
 
 signals:
 
