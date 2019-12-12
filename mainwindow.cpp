@@ -50,11 +50,14 @@ MainWindow::MainWindow(QWidget *parent)
     });
     connect(ui->listWidget,&QListWidget::doubleClicked,[=]{
 
-        char*  ch;
+
+        char buff[128]= "loadfile ../MySystemProject/song/ ";
         QByteArray ba = ui->listWidget->currentItem()->text().toUtf8();
-        ch=ba.data();
-        printf("%s\n",ch);
-        fflush(stdout);
+        strcpy(buf,ba.data());
+        strcat(buff,buf);
+        write(fd,buff,128);
+        //printf("%s\n",buff);
+       // fflush(stdout);
     });
     InitializeListFunction();
 }
@@ -93,7 +96,7 @@ void MainWindow::InitializeListFunction()
 // clicke the pause button
 void MainWindow::MyClickedPlaying()
 {
-       write(fd,"pause\n",128);
+       write(fd,"pause",128);
 }
 
 //set the volume
