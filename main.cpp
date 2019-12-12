@@ -24,23 +24,19 @@ int main(int argc, char *argv[])
         }
         char buf[128] = {0};
         while(1){
-        bzero(buf,sizeof (buf));
-        read(fd,buf,128);
-       if(FLag == 0){
-            system(buf);
-            FLag++;
-            close(0);
-            dup2(1,0);
-       }
-       else {
+            bzero(buf,sizeof (buf));
+            read(fd,buf,128);
+            if(FLag == 0){
+                system(buf);
+                FLag++;
+                close(0);
+                dup2(1,0);
+            }
+             else {
 
-           printf("%s",buf);
-            fflush(stdout);
-
-        }
-
-
-
+                 printf("%s",buf);
+                 fflush(stdout);
+             }
         }
     }
     else{

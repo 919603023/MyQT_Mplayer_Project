@@ -44,7 +44,7 @@ public slots:
    void MyClickedPlaying();
 
    void MyVolumeSet();
-   void MyGetItemText(int row,int column);
+
 private:
     Ui::MainWindow *ui;
 

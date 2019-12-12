@@ -18,25 +18,8 @@ MainWindow::MainWindow(QWidget *parent)
         char a[20];
         sprintf(a,"%d",val);
         strcat(buff1,a);
- //       printf("%s\n",buff1);
- //       fflush(stdout);
         write(fd,buff1,128);
     });
-//    connect(ui->tableWidget,SIGNAL(cellDoubleClicked(int,int)),this,SLOT(MyGetItemText(int row, int column)));
-//    char buff1[128] = "loadfile ../MySystemProject/song/";
-//    QTableWidgetItem *username = new QTableWidgetItem;
-//        username = ui->tableWidget->item(row,0);
-
-//        QByteArray sr =  username->text().toLocal8Bit();
-//        int len = sr.length();
-//        char* buf1 = new char[len+2];
-//        buf[len] = buf[len+1] = 0;
-//        // QByteArray转char*
-//        strcpy(buf,sr.data());
-//    strcpy(buf,buf1);
-//    strcat(buff1,buf);
-//    write(fd,buff1,128);
-
        //当改变选值框的值时，同时进度条也改变位置
        void (QSpinBox::*mysignal)(int) = &QSpinBox::valueChanged;
        connect(ui->spinBox_huds,mysignal, ui->huds, &QSlider::setValue);
@@ -44,7 +27,7 @@ MainWindow::MainWindow(QWidget *parent)
     bzero(buf,sizeof(buf));
     connect(ui->pushButton_pause,SIGNAL(clicked()),this,SLOT(MyClickedPlaying()));
 
-
+    //list fflush button
     connect(ui->pushButton,&QPushButton::clicked,[=]{
         DIR *dir = opendir("../MySystemProject/song");
         int i = 0;
@@ -53,8 +36,6 @@ MainWindow::MainWindow(QWidget *parent)
             struct dirent* dirp = readdir(dir);
 
             if(dirp == NULL){
-
-
                 break;
             }
             else if(dirp->d_type == DT_REG){
@@ -68,7 +49,12 @@ MainWindow::MainWindow(QWidget *parent)
             closedir(dir);
     });
     connect(ui->listWidget,&QListWidget::doubleClicked,[=]{
-       qDebug()<< ui->listWidget->currentItem()->text();
+
+        char*  ch;
+        QByteArray ba = ui->listWidget->currentItem()->text().toUtf8();
+        ch=ba.data();
+        printf("%s\n",ch);
+        fflush(stdout);
     });
     InitializeListFunction();
 }
@@ -77,7 +63,7 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
-
+//the song list initialize
 void MainWindow::InitializeListFunction()
 {
     DIR *dir = opendir("../MySystemProject/song");
@@ -104,13 +90,13 @@ void MainWindow::InitializeListFunction()
         closedir(dir);
 }
 
+// clicke the pause button
 void MainWindow::MyClickedPlaying()
 {
-
-
        write(fd,"pause\n",128);
-
 }
+
+//set the volume
 void MainWindow::MyVolumeSet()
 {
     int val = ui->huds->value();
@@ -121,8 +107,5 @@ void MainWindow::MyVolumeSet()
     write(fd,buff1,128);
 }
 
-void MainWindow::MyGetItemText(int row, int column)
-{
 
-}
 
