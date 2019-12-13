@@ -8,7 +8,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     OpenFlag = 0;
     CutSong = 0;
-    fd = open("fifo",O_RDWR);
+    fd = open("fifo_cmd",O_RDWR);
     if(fd < 0){
          perror("open wronly fifo");
     }
@@ -19,7 +19,9 @@ MainWindow::MainWindow(QWidget *parent)
         char a[20];
         sprintf(a,"%d",val);
         strcat(buff1,a);
-        write(fd,buff1,128);
+        strcat(buff1," 1");
+        strcat(buff1,"\n");
+        write(fd,buff1,strlen(buff1));
     });
        //当改变选值框的值时，同时进度条也改变位置
        void (QSpinBox::*mysignal)(int) = &QSpinBox::valueChanged;
@@ -48,16 +50,17 @@ MainWindow::MainWindow(QWidget *parent)
 
         OpenFlag = 1;
             closedir(dir);
-            MyCutSong();
+ //           MyCutSong();
     });
     connect(ui->listWidget,&QListWidget::doubleClicked,[=]{
 
 
-        char buff[128]= "loadfile ../MyQT_Mplayer_Project/song/ ";
+        char buff[128]= "loadfile ../MyQT_Mplayer_Project/song/";
         QByteArray ba = ui->listWidget->currentItem()->text().toUtf8();
         strcpy(buf,ba.data());
         strcat(buff,buf);
-        write(fd,buff,128);
+        strcat(buff,"\n");
+        write(fd,buff,strlen(buff));
         printf("%s\n",buff);
        fflush(stdout);
 
@@ -88,12 +91,6 @@ void MainWindow::InitializeListFunction()
         }
         i++;
         }
-    if(OpenFlag == 0){
-        char buff[128] = "mplayer  -idle  -slave  -quiet ../MyQT_Mplayer_Project/song/";
-        strcat(buff,buf);
-        write(fd,buff,128);
-    }
-    OpenFlag = 1;
     closedir(dir);
 }
 
@@ -135,7 +132,7 @@ void MainWindow::MyCutSong()
 // clicke the pause button
 void MainWindow::MyClickedPlaying()
 {
-       write(fd,"pause",128);
+       write(fd,"pause\n",strlen ("pause\n"));
 }
 
 //set the volume
@@ -146,7 +143,8 @@ void MainWindow::MyVolumeSet()
     char a[20];
     sprintf(a,"%d",val);
     strcat(buff1,a);
-    write(fd,buff1,128);
+    strcat(buff1,"\n");
+    write(fd,buff1,strlen(buff1));
 }
 
 

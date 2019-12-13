@@ -5,7 +5,7 @@
 
 int main(int argc, char *argv[])
 {
-    int ret = mkfifo("fifo",0664);
+    int ret = mkfifo("fifo_cmd",0664);
     if(ret < 0){
         perror("mkfifo:");
 
@@ -17,27 +17,36 @@ int main(int argc, char *argv[])
     }
     //child
     else if(pid == 0){
-        int FLag = 0;
-        int fd = open("fifo",O_RDWR);
-        if(fd < 0){
-            perror("open fifo");
-        }
-        char buf[128] = {0};
-        while(1){
-            bzero(buf,sizeof (buf));
-            read(fd,buf,128);
-            if(FLag == 0){
-                system(buf);
-                FLag++;
-                close(0);
-                dup2(1,0);
-            }
-             else {
+       int fd = open("fifo_cmd",O_RDWR);
+       close(0);
+       dup2(fd,0);
+        execlp("mplayer",
+                    " mplayer ",
+                    "-slave", "-quiet","-idle",
+                    "-input", "file=./fifo_cmd",
+                    "../MyQT_Mplayer_Project/song/coffee.mp3", NULL);
 
-                 printf("%s\n",buf);
-                 fflush(stdout);
-             }
-        }
+//        int FLag = 0;
+//        int fd = open("fifo",O_RDWR);
+//        if(fd < 0){
+//            perror("open fifo");
+//        }
+//        char buf[128] = {0};
+//        while(1){
+//            bzero(buf,sizeof (buf));
+//            read(fd,buf,128);
+//            if(FLag == 0){
+//                system(buf);
+//                FLag++;
+//                close(0);
+//                dup2(1,0);
+//            }
+//             else {
+
+//                 printf("%s\n",buf);
+//                 fflush(stdout);
+//             }
+//        }
     }
     else{
 
