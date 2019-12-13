@@ -5,9 +5,12 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
+    sem = sem_open("mysem",O_RDWR|O_CREAT,0664,1);
+    sem_init(sem,0,1);
     ui->setupUi(this);
     OpenFlag = 0;
     CutSong = 0;
+    PuaesFlag = 0;
     fd = open("fifo_cmd",O_RDWR);
     if(fd < 0){
          perror("open wronly fifo");
@@ -22,6 +25,7 @@ MainWindow::MainWindow(QWidget *parent)
         strcat(buff1," 1");
         strcat(buff1,"\n");
         write(fd,buff1,strlen(buff1));
+
     });
        //当改变选值框的值时，同时进度条也改变位置
        void (QSpinBox::*mysignal)(int) = &QSpinBox::valueChanged;
@@ -129,10 +133,40 @@ void MainWindow::MyCutSong()
 
 }
 
+int MainWindow::GetPuaesFlag()
+{
+    return PuaesFlag;
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    char buff[128] = "";
+    char buff1[128] = "kill -9 ";
+    sprintf(buff,"%d",pid);
+    strcat(buff1,buff);
+    system(buff1);
+}
+
 // clicke the pause button
 void MainWindow::MyClickedPlaying()
 {
-       write(fd,"pause\n",strlen ("pause\n"));
+   if(PuaesFlag  == 0)
+    {
+        sem_wait(sem);
+
+        write(fd,"pause\n",strlen ("pause\n"));
+
+        PuaesFlag = 1;
+   }
+    else
+   {
+        write(fd,"pause\n",strlen ("pause\n"));
+       sem_post(sem);
+       PuaesFlag = 0;
+   }
+
+
+
 }
 
 //set the volume

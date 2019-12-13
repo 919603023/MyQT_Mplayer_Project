@@ -40,12 +40,17 @@ public:
     ~MainWindow();
     void InitializeListFunction();
     void MyCutSong();
+    int GetPuaesFlag();
     int fd;
+    sem_t *sem;
     char buf[128];
     int OpenFlag;
     int CutSong;
+    pid_t pid;
+    int PuaesFlag;
     QVector<lyric> QVectorLyric;
     lyric StructLyric;
+    void  closeEvent(QCloseEvent *event);
 
 signals:
 
