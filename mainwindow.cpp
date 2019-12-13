@@ -1,9 +1,11 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+
 int PuaesFlag= 0;
 //sem_t *sem;
 pthread_mutex_t mutex;
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -74,6 +76,7 @@ MainWindow::MainWindow(QWidget *parent)
     });
 //    connect(ui->listWidget,SIGNAL(doubleClicked(const QModelIndex &)),this,SLOT(MyDoubleClickedList(const QModelIndex &index)));
     InitializeListFunction();
+//    MyCutSong();
 
 }
 
@@ -96,6 +99,11 @@ void MainWindow::InitializeListFunction()
         else if(dirp->d_type == DT_REG){
             ui->listWidget->addItem(new QListWidgetItem(dirp->d_name));
             strcpy(buf,dirp->d_name);
+            char *buff1 = (char*)malloc(128);
+            strcpy(buff1,buf);
+            QListSongName.push_back(buff1);
+
+
         }
         i++;
         }
@@ -104,11 +112,12 @@ void MainWindow::InitializeListFunction()
 
 void MainWindow::MyCutSong()
 {
+
    char buff[128] = "";
    char Site[128] = "../MyQT_Mplayer_Project/lyrics/";
    char *buff1,*buff2,*buff3,buff4[128] = {0};
-   QVectorLyric.clear();
-//   sscanf(buf,"%s.",buff4);
+
+   sscanf(buf,"%s.",buff4);
    strcpy(buff4,strtok(buf,"."));
    strcat(buff4,".lrc");
    strcat(Site,buff4);
@@ -125,11 +134,12 @@ void MainWindow::MyCutSong()
           sscanf(buff,":%s.",buff2);
           sscanf(buff,".%s]",buff3);
           sscanf(buff,"]%s\n",StructLyric.MyLyric);
-          StructLyric.time = atof(buff1)*60 + atof(buff2) + atof(buff3)*0.01;
-          if(atof(buff3) == 0){
-              sscanf(buff,"[%s]",StructLyric.MyLyric);
-          }
-          QVectorLyric.push_back(StructLyric);
+
+          lyric *temp = (lyric *)malloc(sizeof(lyric));
+          temp->time = atof(buff1)*60 + atof(buff2) + atof(buff3)*0.01;
+          Lyriclist.push_back(*temp);
+
+
       }
 
 
@@ -187,6 +197,7 @@ void *Mydeal_fun(void *arg)
 
 void *deal_fun2(void *arg)
 {
+    usleep(500*1000);
     pthread_mutex_init(&mutex,NULL);
         int fifo_fd1 = (int)(long)arg;
 
@@ -220,6 +231,7 @@ void *deal_fun2(void *arg)
 // clicke the pause button
 void MainWindow::MyClickedPlaying()
 {
+
     if(PuaesFlag == 0)
       {
         PuaesFlag = 1;
@@ -237,6 +249,11 @@ void MainWindow::MyClickedPlaying()
         printf("%d \n",PuaesFlag);
         fflush(stdout);
     }
+    std::for_each(QListSongName.begin(),QListSongName.end(),[=](char *val){
+        printf("%s\n",val);
+        fflush(stdout);
+
+    });
 
 }
 

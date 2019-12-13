@@ -22,11 +22,15 @@
 #include <QByteArray>
 #include <QDebug>
 #include <QVector>
-struct lyric
+#include <QList>
+#include <algorithm>
+#include <numeric>
+#include <iostream>
+typedef   struct
 {
     double time;
     char *MyLyric;
-};
+}lyric;
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -49,8 +53,9 @@ public:
     int OpenFlag;
     int CutSong;
     pid_t pid;
+    QList<lyric> Lyriclist;
 //    int PuaesFlag;
-    QVector<lyric> QVectorLyric;
+    QList<char*> QListSongName;
     lyric StructLyric;
     void  closeEvent(QCloseEvent *event);
     void SetSeekbarfindViewById(int val);
