@@ -2,63 +2,8 @@
 
 #include <QApplication>
 
-void *Mydeal_fun(void *arg)
-{
-   sem_t *sem = sem_open("mysem",O_RDWR|O_CREAT,0664,1);
-   sem_init(sem,0,1);
-    int fd = (int)(long)arg;
-    while(1)
-    {
-        sem_wait(sem);
-        char buf[128] = "";
-        read(fd,buf,sizeof (buf));
-        char cmd[128] = "";
-        sscanf(buf,"%[^=]",cmd);
-        if(strcmp(cmd,"ANS_PERCENT_POSITION") == 0)//百分比
-        {
-            int percent_pos = 0;
-            sscanf(buf,"%*[^=]=%d",&percent_pos);
-            printf("\r当前的百分比为:%%%d \t", percent_pos);
-        }
-         else if(strcmp(cmd,"ANS_TIME_POSITION") == 0)//当前时间
-        {
-             float time_pos = 0;
-              sscanf(buf,"%*[^=]=%f", &time_pos);
-              printf("当前的时间为:%02d:%02d", (int)(time_pos+0.5)/60, (int)(time_pos+0.5)%60);
-        }
-          fflush(stdout);
-          sem_post(sem);
-
-    }
-}
-
-void *deal_fun2(void *arg)
-
-{
-sem_t *sem = sem_open("mysem",O_RDWR|O_CREAT,0664,1);
-sem_init(sem,0,1);
-    int fifo_fd = (int)(long)arg;
-
-    //不停的给fifo_cmd发送获取当前时间以及进度
-
-    while(1)
-
-    {
-sem_wait(sem);
-        usleep(500*1000);//0.5秒发指令
-
-        write(fifo_fd,"get_percent_pos\n", strlen("get_percent_pos\n"));
-
-        usleep(500*1000);//0.5秒发指令
-
-        write(fifo_fd,"get_time_pos\n", strlen("get_time_pos\n"));
-
-sem_post(sem);
-}
-    close(fifo_fd);
 
 
-}
 int main(int argc, char *argv[])
 {
     int ret = mkfifo("fifo_cmd",0664);
@@ -93,10 +38,21 @@ int main(int argc, char *argv[])
     pthread_t send_mplayer;
     pthread_create(&send_mplayer,NULL,deal_fun2 , (void *)fd);
     pthread_detach(send_mplayer);
+
+
     QApplication a(argc, argv);
-MainWindow w;
+    MainWindow w;
     w.show();
     w.pid = pid;
+
+//    while(1)
+//    {
+//        mkfifo("fifo_setbar",0664);
+//        int fdsetbar = open("fifo_setbar",O_RDWR);
+//        int val;
+//        read(fdsetbar,&val,sizeof(int));
+//        w.SetSeekbarfindViewById(val);
+//    }
     return a.exec();
     }
 }

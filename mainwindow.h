@@ -30,6 +30,8 @@ struct lyric
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
+extern void *Mydeal_fun(void *arg);
+extern void *deal_fun2(void *arg);
 
 class MainWindow : public QMainWindow
 {
@@ -42,20 +44,24 @@ public:
     void MyCutSong();
     int GetPuaesFlag();
     int fd;
-    sem_t *sem;
+//    sem_t *sem;
     char buf[128];
     int OpenFlag;
     int CutSong;
     pid_t pid;
-    int PuaesFlag;
+//    int PuaesFlag;
     QVector<lyric> QVectorLyric;
     lyric StructLyric;
     void  closeEvent(QCloseEvent *event);
+    void SetSeekbarfindViewById(int val);
+
+
 
 signals:
 
 public slots:
    void MyClickedPlaying();
+   void MyDoubleClickedList(const QModelIndex &index);
 
 
    void MyVolumeSet();

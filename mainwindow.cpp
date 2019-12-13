@@ -1,16 +1,19 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+int PuaesFlag= 0;
+//sem_t *sem;
+pthread_mutex_t mutex;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
-    sem = sem_open("mysem",O_RDWR|O_CREAT,0664,1);
-    sem_init(sem,0,1);
+    pthread_mutex_init(&mutex,NULL);
+//   sem_init(sem,0,1);
     ui->setupUi(this);
     OpenFlag = 0;
     CutSong = 0;
-    PuaesFlag = 0;
+  //  PuaesFlag = 0;
     fd = open("fifo_cmd",O_RDWR);
     if(fd < 0){
          perror("open wronly fifo");
@@ -69,6 +72,7 @@ MainWindow::MainWindow(QWidget *parent)
        fflush(stdout);
 
     });
+//    connect(ui->listWidget,SIGNAL(doubleClicked(const QModelIndex &)),this,SLOT(MyDoubleClickedList(const QModelIndex &index)));
     InitializeListFunction();
 
 }
@@ -147,27 +151,111 @@ void MainWindow::closeEvent(QCloseEvent *event)
     system(buff1);
 }
 
+void MainWindow::SetSeekbarfindViewById(int val)
+{
+    ui->progress_bar->setValue(val);
+}
+
+void *Mydeal_fun(void *arg)
+{
+
+        int fd = (int)(long)arg;
+        while(1)
+        {
+            char buf[128] = "";
+            read(fd,buf,sizeof (buf));
+            char cmd[128] = "";
+            sscanf(buf,"%[^=]",cmd);
+            if(strcmp(cmd,"ANS_PERCENT_POSITION") == 0)//百分比
+            {
+                int percent_pos = 0;
+                sscanf(buf,"%*[^=]=%d",&percent_pos);
+                printf("\r当前的百分比为:%%%d \t", percent_pos);
+
+
+            }
+             else if(strcmp(cmd,"ANS_TIME_POSITION") == 0)//当前时间
+            {
+                 float time_pos = 0;
+                  sscanf(buf,"%*[^=]=%f", &time_pos);
+                  printf("当前的时间为:%02d:%02d", (int)(time_pos+0.5)/60, (int)(time_pos+0.5)%60);
+            }
+              fflush(stdout);
+
+        }
+}
+
+void *deal_fun2(void *arg)
+{
+    pthread_mutex_init(&mutex,NULL);
+        int fifo_fd1 = (int)(long)arg;
+
+        //不停的给fifo_cmd发送获取当前时间以及进度
+        while(1)
+
+        {
+            pthread_mutex_lock(&mutex);
+            printf("%d **************\n",PuaesFlag);
+            fflush(stdout);
+
+//           sem_wait(sem);
+            usleep(500*1000);//0.5秒发指令
+
+            write(fifo_fd1,"get_percent_pos\n", strlen("get_percent_pos\n"));
+
+            usleep(500*1000);//0.5秒发指令
+
+            write(fifo_fd1,"get_time_pos\n", strlen("get_time_pos\n"));
+//            sem_post(sem);
+           pthread_mutex_unlock(&mutex);
+           usleep(500*1000);
+
+        }
+    }
+
+
+
+
+
 // clicke the pause button
 void MainWindow::MyClickedPlaying()
 {
-   if(PuaesFlag  == 0)
-    {
-        sem_wait(sem);
-
-        write(fd,"pause\n",strlen ("pause\n"));
-
+    if(PuaesFlag == 0)
+      {
         PuaesFlag = 1;
-   }
-    else
-   {
+        pthread_mutex_lock(&mutex);
         write(fd,"pause\n",strlen ("pause\n"));
-       sem_post(sem);
-       PuaesFlag = 0;
-   }
-
-
+ //       sem_wait(sem);
+        printf("wo gai le");
+        fflush(stdout);
+    }
+    else {
+        write(fd,"pause\n",strlen ("pause\n"));
+        PuaesFlag = 0;
+       pthread_mutex_unlock(&mutex);
+ //       sem_post(sem);
+        printf("%d \n",PuaesFlag);
+        fflush(stdout);
+    }
 
 }
+
+void MainWindow::MyDoubleClickedList(const QModelIndex &index)
+{
+    char buff[128]= "loadfile ../MyQT_Mplayer_Project/song/";
+    QByteArray ba = ui->listWidget->currentItem()->text().toUtf8();
+    strcpy(buf,ba.data());
+    strcat(buff,buf);
+    strcat(buff,"\n");
+    write(fd,buff,strlen(buff));
+    printf("%s\n",buff);
+   fflush(stdout);
+}
+
+
+
+
+
 
 //set the volume
 void MainWindow::MyVolumeSet()
