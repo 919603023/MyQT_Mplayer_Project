@@ -4,7 +4,7 @@
 
 int PuaesFlag= 0;
 int setseekbarfindviewbyid = 0;
-float setnowtime = 0;
+int setnowtime = 0;
 float totaltime = 0;
 QString setnowtimeqstring ="";
 //sem_t *sem;
@@ -172,7 +172,7 @@ void MainWindow::MyCutSong()
       printf("%s\n ",buff);
       fflush(stdout);
       strcpy(Lyric[i-4]->MyLyric,buff) ;
-      Lyric[i-4]->time = val1*600+val2*10+val3/10;
+      Lyric[i-4]->time = val1*600+val2*10;
       qDebug()<<Lyric[i-4]->MyLyric;
       qDebug()<<Lyric[i-4]->time;
       fflush(stdout);
@@ -296,6 +296,7 @@ void SendMsgToMplayer(char *val)
 {
    int fd = open("fifo_cmd",O_RDWR);
     write(fd,val,strlen(val));
+    close(fd);
 }
 char *QStringToChar(QString val)
 {
