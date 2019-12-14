@@ -52,16 +52,15 @@ MainWindow::MainWindow(QWidget *parent)
         ui->listWidget->clear();
         while (1) {
             struct dirent* dirp = readdir(dir);
-
             if(dirp == NULL){
                 break;
             }
-            else if(dirp->d_type == DT_REG){
+            else if(dirp->d_type ==  DT_REG){
                 ui->listWidget->addItem(new QListWidgetItem(dirp->d_name));
             }
             i++;
             }
-        OpenFlag = 1;
+            OpenFlag = 1;
             closedir(dir);
             MyCutSong();
     });
@@ -132,8 +131,6 @@ void MainWindow::InitializeListFunction()
 //            char *buff1 = (char*)malloc(128);
 //            strcpy(buff1,buf);
 //            QListSongName.push_back(buff1);
-
-
         }
         i++;
         }
@@ -173,8 +170,6 @@ void MainWindow::MyCutSong()
       fflush(stdout);
       strcpy(Lyric[i-4]->MyLyric,buff) ;
       Lyric[i-4]->time = val1*600+val2*10;
-      qDebug()<<Lyric[i-4]->MyLyric;
-      qDebug()<<Lyric[i-4]->time;
       fflush(stdout);
        Lyriclist.push_back(Lyric[i-4]);
       }
@@ -345,4 +340,3 @@ void *MyGetTimeAndBar(void *arg)
               fflush(stdout);
         }
 }
-
