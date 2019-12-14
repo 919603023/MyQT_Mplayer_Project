@@ -59,7 +59,8 @@ public:
     lyric StructLyric;
     void  closeEvent(QCloseEvent *event);
     void SetSeekbarfindViewById(int val);
-
+    void MusicNext();
+    void MusicFront();
 
 
 signals:
@@ -69,7 +70,7 @@ public slots:
    void MyDoubleClickedList(const QModelIndex &index);
 
 
-   void MyVolumeSet();
+
 
 private:
     Ui::MainWindow *ui;

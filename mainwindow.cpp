@@ -29,12 +29,17 @@ MainWindow::MainWindow(QWidget *parent)
         strcat(buff1,a);
         strcat(buff1," 1");
         strcat(buff1,"\n");
+        if(PuaesFlag == 0)
+        {
         write(fd,buff1,strlen(buff1));
+        }
+
+
 
     });
        //当改变选值框的值时，同时进度条也改变位置
        void (QSpinBox::*mysignal)(int) = &QSpinBox::valueChanged;
-       connect(ui->spinBox_huds,mysignal, ui->huds, &QSlider::setValue);
+
 
     bzero(buf,sizeof(buf));
     connect(ui->pushButton_pause,SIGNAL(clicked()),this,SLOT(MyClickedPlaying()));
@@ -77,6 +82,13 @@ MainWindow::MainWindow(QWidget *parent)
 //    connect(ui->listWidget,SIGNAL(doubleClicked(const QModelIndex &)),this,SLOT(MyDoubleClickedList(const QModelIndex &index)));
     InitializeListFunction();
 //    MyCutSong();
+    connect(ui->pushButton_last,&QPushButton::clicked,[=]{
+        MusicFront();
+    });
+    connect(ui->pushButton_next,&QPushButton::clicked,[=]{
+        MusicNext();
+    });
+
 
 }
 
@@ -90,6 +102,7 @@ void MainWindow::InitializeListFunction()
     DIR *dir = opendir("../MyQT_Mplayer_Project/song");
     int i = 0;
     ui->listWidget->clear();
+    ui->listWidget->setCurrentRow(0);
     while (1) {
         struct dirent* dirp = readdir(dir);
 
@@ -210,23 +223,59 @@ void *deal_fun2(void *arg)
             fflush(stdout);
 
 //           sem_wait(sem);
-            usleep(500*1000);//0.5秒发指令
+            usleep(500*100);//0.5秒发指令
 
             write(fifo_fd1,"get_percent_pos\n", strlen("get_percent_pos\n"));
 
-            usleep(500*1000);//0.5秒发指令
+            usleep(500*100);//0.5秒发指令
 
             write(fifo_fd1,"get_time_pos\n", strlen("get_time_pos\n"));
 //            sem_post(sem);
            pthread_mutex_unlock(&mutex);
-           usleep(500*1000);
+           usleep(500*100);
 
         }
     }
 
 
-
-
+void MainWindow::MusicFront()
+{
+    if(ui->listWidget->currentRow() == 0)//当光标在第一个文件时，点击上一个光标移动到最下面的文件，不播放
+    {
+        ui->listWidget->setCurrentRow(ui->listWidget->count()-1);
+    }
+    else
+    {
+        ui->listWidget->setCurrentRow(ui->listWidget->currentRow()-1);
+    }
+    char buff[128]= "loadfile ../MyQT_Mplayer_Project/song/";
+    QByteArray ba = ui->listWidget->currentItem()->text().toUtf8();
+    strcpy(buf,ba.data());
+    strcat(buff,buf);
+    strcat(buff,"\n");
+    write(fd,buff,strlen(buff));
+    printf("%s\n",buff);
+    fflush(stdout);
+}
+void MainWindow::MusicNext()
+{
+    if(ui->listWidget->currentRow() == ui->listWidget->count()-1)
+    {
+        ui->listWidget->setCurrentRow(0);//当光标在最后一个文件时，点击下一个，光标移动到第一个，不播放
+    }
+    else
+    {
+        ui->listWidget->setCurrentRow(ui->listWidget->currentRow()+1);
+    }
+    char buff[128]= "loadfile ../MyQT_Mplayer_Project/song/";
+    QByteArray ba = ui->listWidget->currentItem()->text().toUtf8();
+    strcpy(buf,ba.data());
+    strcat(buff,buf);
+    strcat(buff,"\n");
+    write(fd,buff,strlen(buff));
+    printf("%s\n",buff);
+    fflush(stdout);
+}
 
 // clicke the pause button
 void MainWindow::MyClickedPlaying()
@@ -274,17 +323,7 @@ void MainWindow::MyDoubleClickedList(const QModelIndex &index)
 
 
 
-//set the volume
-void MainWindow::MyVolumeSet()
-{
-    int val = ui->huds->value();
-    char buff1[128] ="volume ";
-    char a[20];
-    sprintf(a,"%d",val);
-    strcat(buff1,a);
-    strcat(buff1,"\n");
-    write(fd,buff1,strlen(buff1));
-}
+
 
 
 
