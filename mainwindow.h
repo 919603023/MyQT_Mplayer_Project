@@ -36,7 +36,10 @@ namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 extern void *Mydeal_fun(void *arg);
 extern void *deal_fun2(void *arg);
-
+extern void SetSeekBarFindViewById(int val);
+extern void SetNowTime(float val);
+extern void TotalTime(float val);
+extern void SetNowTimeQstring(float val);
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -58,7 +61,6 @@ public:
     QList<char*> QListSongName;
     lyric StructLyric;
     void  closeEvent(QCloseEvent *event);
-    void SetSeekbarfindViewById(int val);
     void MusicNext();
     void MusicFront();
 

@@ -3,6 +3,10 @@
 
 
 int PuaesFlag= 0;
+int setseekbarfindviewbyid = 0;
+float setnowtime = 0;
+float totaltime = 0;
+QString setnowtimeqstring ="";
 //sem_t *sem;
 pthread_mutex_t mutex;
 
@@ -10,6 +14,9 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
+    QTimer *time = new QTimer(this);
+    time->start(1000);
+
     pthread_mutex_init(&mutex,NULL);
 //   sem_init(sem,0,1);
     ui->setupUi(this);
@@ -88,8 +95,14 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->pushButton_next,&QPushButton::clicked,[=]{
         MusicNext();
     });
+    connect(time, &QTimer::timeout, [=](){
+        SetNowTimeQstring(setnowtime);
+        ui->progress_bar->setValue(setseekbarfindviewbyid);
+        ui->label_nowtime->setText(setnowtimeqstring);
+            });
 
-
+ui->spinBox_huds->setValue(99);
+ui->huds->setValue(99);
 }
 
 MainWindow::~MainWindow()
@@ -174,10 +187,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     system(buff1);
 }
 
-void MainWindow::SetSeekbarfindViewById(int val)
-{
-    ui->progress_bar->setValue(val);
-}
+
 
 void *Mydeal_fun(void *arg)
 {
@@ -193,7 +203,9 @@ void *Mydeal_fun(void *arg)
             {
                 int percent_pos = 0;
                 sscanf(buf,"%*[^=]=%d",&percent_pos);
-                printf("\r当前的百分比为:%%%d \t", percent_pos);
+                SetSeekBarFindViewById(percent_pos);
+
+//                printf("\r当前的百分比为:%%%d \t", percent_pos);
 
 
             }
@@ -201,7 +213,8 @@ void *Mydeal_fun(void *arg)
             {
                  float time_pos = 0;
                   sscanf(buf,"%*[^=]=%f", &time_pos);
-                  printf("当前的时间为:%02d:%02d", (int)(time_pos+0.5)/60, (int)(time_pos+0.5)%60);
+                  SetNowTime(time_pos);
+//                  printf("当前的时间为:%02d:%02d", (int)(time_pos+0.5)/60, (int)(time_pos+0.5)%60);
             }
               fflush(stdout);
 
@@ -298,11 +311,11 @@ void MainWindow::MyClickedPlaying()
         printf("%d \n",PuaesFlag);
         fflush(stdout);
     }
-    std::for_each(QListSongName.begin(),QListSongName.end(),[=](char *val){
-        printf("%s\n",val);
-        fflush(stdout);
-
-    });
+//    std::for_each(QListSongName.begin(),QListSongName.end(),[=](char *val){
+//        printf("%s\n",val);
+//        fflush(stdout);
+//
+//    });
 
 }
 
@@ -318,10 +331,29 @@ void MainWindow::MyDoubleClickedList(const QModelIndex &index)
    fflush(stdout);
 }
 
+void SetSeekBarFindViewById(int val)
+{
+    setseekbarfindviewbyid = val;
+}
+void SetNowTime(float val)
+{
+    setnowtime = val;
+}
+void TotalTime(float val)
+{
+    totaltime = val;
+}
+void SetNowTimeQstring(float val)
+{
+    char buff[128] = {0};
+   int i = val;
 
-
-
-
+   int minute = i/60;
+   int second = i%60;
+   int msec = ((int)(val*10))%10;
+   sprintf(buff,"%02d:%02d",minute,second);
+   setnowtimeqstring = QString(buff);
+}
 
 
 
