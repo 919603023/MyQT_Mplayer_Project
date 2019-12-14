@@ -60,10 +60,12 @@ MainWindow::MainWindow(QWidget *parent)
     });
     connect(ui->listWidget,&QListWidget::doubleClicked,[=]{
         char buff[128]= "";
-        sprintf(buff,"loadfile \"../MyQT_Mplayer_Project/song/%s\"\n",QStringToChar(ui->listWidget->currentItem()->text()));
+        strcpy(buf,QStringToChar(ui->listWidget->currentItem()->text()));
+        sprintf(buff,"loadfile \"../MyQT_Mplayer_Project/song/%s\"\n",buf);
         SendMsgToMplayer(buff);
         printf("%s\n",buff);
        fflush(stdout);
+
 
     });
 //    connect(ui->listWidget,SIGNAL(doubleClicked(const QModelIndex &)),this,SLOT(MyDoubleClickedList(const QModelIndex &index)));
@@ -104,9 +106,9 @@ void MainWindow::InitializeListFunction()
         else if(dirp->d_type == DT_REG){
             ui->listWidget->addItem(new QListWidgetItem(dirp->d_name));
             strcpy(buf,dirp->d_name);
-            char *buff1 = (char*)malloc(128);
-            strcpy(buff1,buf);
-            QListSongName.push_back(buff1);
+//            char *buff1 = (char*)malloc(128);
+//            strcpy(buff1,buf);
+//            QListSongName.push_back(buff1);
 
 
         }
@@ -119,13 +121,17 @@ void MainWindow::MyCutSong()
 {
 
    char buff[128] = "";
-   char Site[128] = "../MyQT_Mplayer_Project/lyrics/";
-   char *buff1,*buff2,*buff3,buff4[128] = {0};
+   char Site[128] = "";
+   int val1,val2,val3;
+   char buff1[128];
+    strcpy(buff,buf);
+    strcpy(&(buff[strlen(buff)-4]),".lrc");
+    sprintf(Site,"../MyQT_Mplayer_Project/lyrics/%s",buff);
 
-   sscanf(buf,"%s.",buff4);
-   strcpy(buff4,strtok(buf,"."));
-   strcat(buff4,".lrc");
-   strcat(Site,buff4);
+//   sscanf(buf,"%s.",buff4);
+//   strcpy(buff4,strtok(buf,"."));
+//   strcat(buff4,".lrc");
+//   strcat(Site,buff4);
    printf("%s",Site);
    fflush(stdout);
    FILE *MyFd;
@@ -133,17 +139,28 @@ void MainWindow::MyCutSong()
     perror("fopen the lyric");
     return;
   }
-  while(fgets(buff, sizeof(buff), MyFd) != NULL)
+  while(fgets(buff1, sizeof(buff1), MyFd) != NULL)
       {
-          sscanf(buff,"[%s:",buff1);
-          sscanf(buff,":%s.",buff2);
-          sscanf(buff,".%s]",buff3);
-          sscanf(buff,"]%s\n",StructLyric.MyLyric);
+      printf("***********\n ");
+      fflush(stdout);
+      if(buff1[1] < 57)
+      {
 
-          lyric *temp = (lyric *)malloc(sizeof(lyric));
-          temp->time = atof(buff1)*60 + atof(buff2) + atof(buff3)*0.01;
-          Lyriclist.push_back(*temp);
+      lyric *temp = (lyric *)malloc(sizeof(float)+sizeof(char *));
+      sprintf(buff1,"[%d:%d.%d]%s\0",val1,val2,val3,temp->MyLyric);
 
+      temp->time = val1*60+val2+((float)(val3/10));
+      printf("%s\n",temp->MyLyric);
+      fflush(stdout);
+//          sscanf(buff,"[%s:",buff1);
+//          sscanf(buff,":%s.",buff2);
+//          sscanf(buff,".%s]",buff3);
+//          sscanf(buff,"]%s\n",StructLyric.MyLyric);
+       Lyriclist.push_back(temp);
+
+
+
+      }
 
       }
 
@@ -209,10 +226,12 @@ void MainWindow::MusicFront()
         ui->listWidget->setCurrentRow(ui->listWidget->currentRow()-1);
     }
     char buff[128]= {0};
-    sprintf(buff,"loadfile \"../MyQT_Mplayer_Project/song/%s\"\n",QStringToChar(ui->listWidget->currentItem()->text()));
+    strcpy(buf,QStringToChar(ui->listWidget->currentItem()->text()));
+    sprintf(buff,"loadfile \"../MyQT_Mplayer_Project/song/%s\"\n",buf);
     SendMsgToMplayer(buff);
     printf("%s\n",buff);
     fflush(stdout);
+
 }
 void MainWindow::MusicNext()
 {
@@ -225,10 +244,12 @@ void MainWindow::MusicNext()
         ui->listWidget->setCurrentRow(ui->listWidget->currentRow()+1);
     }
     char buff[128]= {0};
-    sprintf(buff,"loadfile \"../MyQT_Mplayer_Project/song/%s\"\n",QStringToChar(ui->listWidget->currentItem()->text()));
+    strcpy(buf,QStringToChar(ui->listWidget->currentItem()->text()));
+    sprintf(buff,"loadfile \"../MyQT_Mplayer_Project/song/%s\"\n",buf);
     SendMsgToMplayer(buff);
     printf("%s\n",buff);
     fflush(stdout);
+
 }
 // clicke the pause button
 void MainWindow::MyClickedPlaying()
@@ -249,6 +270,7 @@ void MainWindow::MyClickedPlaying()
         printf("%d \n",PuaesFlag);
         fflush(stdout);
     }
+    MyCutSong();
 }
 void MainWindow::MyDoubleClickedList(const QModelIndex &index)
 {

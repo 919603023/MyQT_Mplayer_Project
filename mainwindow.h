@@ -26,6 +26,7 @@
 #include <algorithm>
 #include <numeric>
 #include <iostream>
+#include <QTextCodec>
 typedef   struct
 {
     double time;
@@ -57,7 +58,7 @@ public:
     int OpenFlag;
     int CutSong;
     pid_t pid;
-    QList<lyric> Lyriclist;
+    QList<lyric*> Lyriclist;
 //    int PuaesFlag;
     QList<char*> QListSongName;
     lyric StructLyric;

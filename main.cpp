@@ -32,13 +32,19 @@ int main(int argc, char *argv[])
     }
     else{
      int fd = open("fifo_cmd",O_WRONLY);
-       pthread_t mplayer_ack;
-       pthread_create(&mplayer_ack,NULL,MyGetTimeAndBar,(void *)(fd1[0]));
+    pthread_t mplayer_ack;
+    pthread_create(&mplayer_ack,NULL,MyGetTimeAndBar,(void *)(fd1[0]));
     pthread_detach(mplayer_ack);
     pthread_t send_mplayer;
     pthread_create(&send_mplayer,NULL,MySendMsgToMplayer,(void *)fd);
     pthread_detach(send_mplayer);
     QApplication a(argc, argv);
+    QTextCodec *codec = QTextCodec::codecForName("utf8");
+
+
+
+      QTextCodec::setCodecForLocale(codec);
+
 
     MainWindow w;
     w.show();
