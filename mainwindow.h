@@ -29,8 +29,8 @@
 #include <QTextCodec>
 typedef   struct
 {
-    double time;
-    char *MyLyric;
+    int time;
+    char MyLyric[128];
 }lyric;
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -43,6 +43,7 @@ extern void TotalTime(float val);
 extern void SetNowTimeQstring(float val);
 extern void SendMsgToMplayer(char *val);
 extern char *QStringToChar(QString val);
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -52,13 +53,16 @@ public:
     ~MainWindow();
     void InitializeListFunction();
     void MyCutSong();
+    char*MyFindLyric();
     int fd;
 //    sem_t *sem;
     char buf[128];
     int OpenFlag;
     int CutSong;
     pid_t pid;
-    QList<lyric*> Lyriclist;
+    int HaveLyricFlag;
+    lyric *Lyric[128];
+
 //    int PuaesFlag;
     QList<char*> QListSongName;
     lyric StructLyric;

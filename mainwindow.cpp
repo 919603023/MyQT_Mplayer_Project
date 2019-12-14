@@ -9,14 +9,20 @@ float totaltime = 0;
 QString setnowtimeqstring ="";
 //sem_t *sem;
 pthread_mutex_t mutex;
-
+QList<lyric*> Lyriclist;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
+    for(int i = 0;i < 128;i++)
+    {
+        lyric *val = (lyric*)malloc(sizeof (int)+128);
+        Lyric[i] = val;
+    }
+    HaveLyricFlag = 0;
     fd = open("fifo_cmd",O_RDWR);
     QTimer *time = new QTimer(this);
-    time->start(1000);
+    time->start(100);
     pthread_mutex_init(&mutex,NULL);
     ui->setupUi(this);
     OpenFlag = 0;
@@ -24,10 +30,11 @@ MainWindow::MainWindow(QWidget *parent)
     if(fd < 0){
          perror("open wronly fifo");
     }
+
     connect(ui->huds, &QSlider::valueChanged, ui->spinBox_huds, &QSpinBox::setValue);
     connect(ui->huds,&QSlider::valueChanged,[=]{
         char buff[128] ={0};
-        sprintf(buff,"volume %d 1",ui->spinBox_huds->value());
+        sprintf(buff,"volume %d 1\n",ui->spinBox_huds->value());
         if(PuaesFlag == 0)
         {
          SendMsgToMplayer(buff);
@@ -56,7 +63,7 @@ MainWindow::MainWindow(QWidget *parent)
             }
         OpenFlag = 1;
             closedir(dir);
- //           MyCutSong();
+            MyCutSong();
     });
     connect(ui->listWidget,&QListWidget::doubleClicked,[=]{
         char buff[128]= "";
@@ -65,6 +72,7 @@ MainWindow::MainWindow(QWidget *parent)
         SendMsgToMplayer(buff);
         printf("%s\n",buff);
        fflush(stdout);
+       MyCutSong();
 
 
     });
@@ -81,7 +89,20 @@ MainWindow::MainWindow(QWidget *parent)
         SetNowTimeQstring(setnowtime);
         ui->progress_bar->setValue(setseekbarfindviewbyid);
         ui->label_nowtime->setText(setnowtimeqstring);
-            });
+        if(HaveLyricFlag == 1)
+        {
+            if(strcmp(MyFindLyric(), "__nohave") != 0)
+            {
+               ui->label_lyric->setText(MyFindLyric());
+            }
+
+        }
+        else
+        {
+            ui->label_lyric->setText("No have lyric");
+        }
+
+        });
 
 ui->spinBox_huds->setValue(99);
 ui->huds->setValue(99);
@@ -116,10 +137,11 @@ void MainWindow::InitializeListFunction()
         }
     closedir(dir);
 }
-
 void MainWindow::MyCutSong()
 {
 
+
+   printf("a wo si la\n");fflush(stdout);
    char buff[128] = "";
    char Site[128] = "";
    int val1,val2,val3;
@@ -127,46 +149,50 @@ void MainWindow::MyCutSong()
     strcpy(buff,buf);
     strcpy(&(buff[strlen(buff)-4]),".lrc");
     sprintf(Site,"../MyQT_Mplayer_Project/lyrics/%s",buff);
-
-//   sscanf(buf,"%s.",buff4);
-//   strcpy(buff4,strtok(buf,"."));
-//   strcat(buff4,".lrc");
-//   strcat(Site,buff4);
    printf("%s",Site);
    fflush(stdout);
    FILE *MyFd;
+   HaveLyricFlag = 0;
   if( (MyFd = fopen(Site,"r+")) == NULL){
     perror("fopen the lyric");
+
     return;
   }
+  int i = 0;
   while(fgets(buff1, sizeof(buff1), MyFd) != NULL)
       {
-      printf("***********\n ");
-      fflush(stdout);
-      if(buff1[1] < 57)
+      if(i > 3)
       {
 
-      lyric *temp = (lyric *)malloc(sizeof(float)+sizeof(char *));
-      sprintf(buff1,"[%d:%d.%d]%s\0",val1,val2,val3,temp->MyLyric);
-
-      temp->time = val1*60+val2+((float)(val3/10));
-      printf("%s\n",temp->MyLyric);
+     sscanf(buff1,"[%02d:%02d.%02d]",&val1,&val2,&val3);
+      strcpy(buff,&(buff1[10]));
+      strcpy(&(buff[strlen(buff)-2]),"\n\0\0");
+      printf("%s\n ",buff);
       fflush(stdout);
-//          sscanf(buff,"[%s:",buff1);
-//          sscanf(buff,":%s.",buff2);
-//          sscanf(buff,".%s]",buff3);
-//          sscanf(buff,"]%s\n",StructLyric.MyLyric);
-       Lyriclist.push_back(temp);
-
-
-
+      strcpy(Lyric[i-4]->MyLyric,buff) ;
+      Lyric[i-4]->time = val1*600+val2*10+val3/10;
+      qDebug()<<Lyric[i-4]->MyLyric;
+      qDebug()<<Lyric[i-4]->time;
+      fflush(stdout);
+       Lyriclist.push_back(Lyric[i-4]);
       }
-
+      i++;
       }
+  HaveLyricFlag = 1;
+}
 
+char* MainWindow::MyFindLyric()
+{
+    std::for_each(Lyriclist.begin(),Lyriclist.end(),[=](lyric* val ){
+        if(setnowtime*10 == val->time)
+        {
+            printf("%s\n",val->MyLyric);
+            fflush(stdout);
 
-
-
+            return val->MyLyric;
+        }
+    });
+    return "__nohave";
 }
 void MainWindow::closeEvent(QCloseEvent *event)
 {
@@ -174,47 +200,6 @@ void MainWindow::closeEvent(QCloseEvent *event)
     sprintf(buff,"kill -9 %d",pid);
     system(buff);
 }
-void *MyGetTimeAndBar(void *arg)
-{
-        int fd = (int)(long)arg;
-        while(1)
-        {
-            char buf[128] = "";
-            read(fd,buf,sizeof (buf));
-            char cmd[128] = "";
-            sscanf(buf,"%[^=]",cmd);
-            if(strcmp(cmd,"ANS_PERCENT_POSITION") == 0)//百分比
-            {
-                int percent_pos = 0;
-                sscanf(buf,"%*[^=]=%d",&percent_pos);
-                SetSeekBarFindViewById(percent_pos);
-            }
-             else if(strcmp(cmd,"ANS_TIME_POSITION") == 0)//当前时间
-            {
-                 float time_pos = 0;
-                  sscanf(buf,"%*[^=]=%f", &time_pos);
-                  SetNowTime(time_pos);
-            }
-              fflush(stdout);
-        }
-}
-void *MySendMsgToMplayer(void *arg)
-{
-    usleep(500*1000);
-    pthread_mutex_init(&mutex,NULL);
-        int fifo_fd1 = (int)(long)arg;
-        //不停的给fifo_cmd发送获取当前时间以及进度
-        while(1)
-        {
-            pthread_mutex_lock(&mutex);
-            usleep(500*100);//0.05秒发指令
-            SendMsgToMplayer("get_percent_pos\n");
-            usleep(500*100);//0.05秒发指令
-            SendMsgToMplayer("get_time_pos\n");
-           pthread_mutex_unlock(&mutex);
-           usleep(500*100);//0.05秒发指令
-        }
-    }
 void MainWindow::MusicFront()
 {
     if(ui->listWidget->currentRow() == 0)//当光标在第一个文件时，点击上一个光标移动到最下面的文件，不播放
@@ -231,6 +216,7 @@ void MainWindow::MusicFront()
     SendMsgToMplayer(buff);
     printf("%s\n",buff);
     fflush(stdout);
+    MyCutSong();
 
 }
 void MainWindow::MusicNext()
@@ -249,6 +235,7 @@ void MainWindow::MusicNext()
     SendMsgToMplayer(buff);
     printf("%s\n",buff);
     fflush(stdout);
+    MyCutSong();
 
 }
 // clicke the pause button
@@ -317,3 +304,46 @@ char *QStringToChar(QString val)
     QByteArray ba = val.toUtf8();
     return ba.data();
 }
+
+void *MySendMsgToMplayer(void *arg)
+{
+    usleep(500*1000);
+    pthread_mutex_init(&mutex,NULL);
+//        int fifo_fd1 = (int)(long)arg;
+        //不停的给fifo_cmd发送获取当前时间以及进度
+        while(1)
+        {
+            pthread_mutex_lock(&mutex);
+            usleep(500*100);//0.05秒发指令
+            SendMsgToMplayer("get_percent_pos\n");
+            usleep(500*100);//0.05秒发指令
+            SendMsgToMplayer("get_time_pos\n");
+           pthread_mutex_unlock(&mutex);
+           usleep(500*100);//0.05秒发指令
+        }
+}
+void *MyGetTimeAndBar(void *arg)
+{
+        int fd = (int)(long)arg;
+        while(1)
+        {
+            char buf[128] = "";
+            read(fd,buf,sizeof (buf));
+            char cmd[128] = "";
+            sscanf(buf,"%[^=]",cmd);
+            if(strcmp(cmd,"ANS_PERCENT_POSITION") == 0)//百分比
+            {
+                int percent_pos = 0;
+                sscanf(buf,"%*[^=]=%d",&percent_pos);
+                SetSeekBarFindViewById(percent_pos);
+            }
+             else if(strcmp(cmd,"ANS_TIME_POSITION") == 0)//当前时间
+            {
+                 float time_pos = 0;
+                  sscanf(buf,"%*[^=]=%f", &time_pos);
+                  SetNowTime(time_pos);
+            }
+              fflush(stdout);
+        }
+}
+
