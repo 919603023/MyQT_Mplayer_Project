@@ -87,6 +87,8 @@ MainWindow::MainWindow(QWidget *parent)
     });
     connect(time, &QTimer::timeout, [=](){
         SetNowTimeQstring(setnowtime);
+        printf("this time is  %f\n",setnowtime);
+        fflush(stdout);
         ui->progress_bar->setValue(setseekbarfindviewbyid);
         ui->label_nowtime->setText(setnowtimeqstring);
         if(HaveLyricFlag == 1)
@@ -179,20 +181,21 @@ void MainWindow::MyCutSong()
       i++;
       }
   HaveLyricFlag = 1;
+  fclose(MyFd);
 }
 
 char* MainWindow::MyFindLyric()
 {
+    strcpy(MyBuff,"__nohave");
     std::for_each(Lyriclist.begin(),Lyriclist.end(),[=](lyric* val ){
-        if(setnowtime*10 == val->time)
+        if((int)(setnowtime*10) == val->time)
         {
             printf("%s\n",val->MyLyric);
             fflush(stdout);
-
-            return val->MyLyric;
+            strcpy(MyBuff,val->MyLyric);
         }
     });
-    return "__nohave";
+    return MyBuff;
 }
 void MainWindow::closeEvent(QCloseEvent *event)
 {
@@ -257,17 +260,12 @@ void MainWindow::MyClickedPlaying()
         printf("%d \n",PuaesFlag);
         fflush(stdout);
     }
-    MyCutSong();
+//    MyCutSong();
 }
 void MainWindow::MyDoubleClickedList(const QModelIndex &index)
 {
     char buff[128]= "loadfile ../MyQT_Mplayer_Project/song/";
     sprintf(buff,"loadfile \"../MyQT_Mplayer_Project/song/%s\"\n",QStringToChar(ui->listWidget->currentItem()->text()));
-//    QByteArray ba = ui->listWidget->currentItem()->text().toUtf8();
-//    strcpy(buf,ba.data());
-//    strcat(buff,buf);
-//    strcat(buff,"\n");
-//    write(fd,buff,strlen(buff));
     printf("%s\n",buff);
    fflush(stdout);
 }

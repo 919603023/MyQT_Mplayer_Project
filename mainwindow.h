@@ -62,6 +62,7 @@ public:
     pid_t pid;
     int HaveLyricFlag;
     lyric *Lyric[128];
+    char MyBuff[128];
 
 //    int PuaesFlag;
     QList<char*> QListSongName;
