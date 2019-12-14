@@ -14,40 +14,27 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
+    fd = open("fifo_cmd",O_RDWR);
     QTimer *time = new QTimer(this);
     time->start(1000);
-
     pthread_mutex_init(&mutex,NULL);
-//   sem_init(sem,0,1);
     ui->setupUi(this);
     OpenFlag = 0;
     CutSong = 0;
-  //  PuaesFlag = 0;
-    fd = open("fifo_cmd",O_RDWR);
     if(fd < 0){
          perror("open wronly fifo");
     }
     connect(ui->huds, &QSlider::valueChanged, ui->spinBox_huds, &QSpinBox::setValue);
     connect(ui->huds,&QSlider::valueChanged,[=]{
-        int val = ui->spinBox_huds->value();
-        char buff1[128] ="volume ";
-        char a[20];
-        sprintf(a,"%d",val);
-        strcat(buff1,a);
-        strcat(buff1," 1");
-        strcat(buff1,"\n");
+        char buff[128] ={0};
+        sprintf(buff,"volume %d 1",ui->spinBox_huds->value());
         if(PuaesFlag == 0)
         {
-        write(fd,buff1,strlen(buff1));
+         SendMsgToMplayer(buff);
         }
-
-
-
     });
        //当改变选值框的值时，同时进度条也改变位置
-       void (QSpinBox::*mysignal)(int) = &QSpinBox::valueChanged;
-
-
+    void (QSpinBox::*mysignal)(int) = &QSpinBox::valueChanged;
     bzero(buf,sizeof(buf));
     connect(ui->pushButton_pause,SIGNAL(clicked()),this,SLOT(MyClickedPlaying()));
 
@@ -64,24 +51,17 @@ MainWindow::MainWindow(QWidget *parent)
             }
             else if(dirp->d_type == DT_REG){
                 ui->listWidget->addItem(new QListWidgetItem(dirp->d_name));
-
             }
             i++;
             }
-
         OpenFlag = 1;
             closedir(dir);
  //           MyCutSong();
     });
     connect(ui->listWidget,&QListWidget::doubleClicked,[=]{
-
-
-        char buff[128]= "loadfile ../MyQT_Mplayer_Project/song/";
-        QByteArray ba = ui->listWidget->currentItem()->text().toUtf8();
-        strcpy(buf,ba.data());
-        strcat(buff,buf);
-        strcat(buff,"\n");
-        write(fd,buff,strlen(buff));
+        char buff[128]= "";
+        sprintf(buff,"loadfile \"../MyQT_Mplayer_Project/song/%s\"\n",QStringToChar(ui->listWidget->currentItem()->text()));
+        SendMsgToMplayer(buff);
         printf("%s\n",buff);
        fflush(stdout);
 
@@ -104,7 +84,6 @@ MainWindow::MainWindow(QWidget *parent)
 ui->spinBox_huds->setValue(99);
 ui->huds->setValue(99);
 }
-
 MainWindow::~MainWindow()
 {
     delete ui;
@@ -172,26 +151,14 @@ void MainWindow::MyCutSong()
 
 
 }
-
-int MainWindow::GetPuaesFlag()
-{
-    return PuaesFlag;
-}
-
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     char buff[128] = "";
-    char buff1[128] = "kill -9 ";
-    sprintf(buff,"%d",pid);
-    strcat(buff1,buff);
-    system(buff1);
+    sprintf(buff,"kill -9 %d",pid);
+    system(buff);
 }
-
-
-
-void *Mydeal_fun(void *arg)
+void *MyGetTimeAndBar(void *arg)
 {
-
         int fd = (int)(long)arg;
         while(1)
         {
@@ -204,53 +171,33 @@ void *Mydeal_fun(void *arg)
                 int percent_pos = 0;
                 sscanf(buf,"%*[^=]=%d",&percent_pos);
                 SetSeekBarFindViewById(percent_pos);
-
-//                printf("\r当前的百分比为:%%%d \t", percent_pos);
-
-
             }
              else if(strcmp(cmd,"ANS_TIME_POSITION") == 0)//当前时间
             {
                  float time_pos = 0;
                   sscanf(buf,"%*[^=]=%f", &time_pos);
                   SetNowTime(time_pos);
-//                  printf("当前的时间为:%02d:%02d", (int)(time_pos+0.5)/60, (int)(time_pos+0.5)%60);
             }
               fflush(stdout);
-
         }
 }
-
-void *deal_fun2(void *arg)
+void *MySendMsgToMplayer(void *arg)
 {
     usleep(500*1000);
     pthread_mutex_init(&mutex,NULL);
         int fifo_fd1 = (int)(long)arg;
-
         //不停的给fifo_cmd发送获取当前时间以及进度
         while(1)
-
         {
             pthread_mutex_lock(&mutex);
-            printf("%d **************\n",PuaesFlag);
-            fflush(stdout);
-
-//           sem_wait(sem);
-            usleep(500*100);//0.5秒发指令
-
-            write(fifo_fd1,"get_percent_pos\n", strlen("get_percent_pos\n"));
-
-            usleep(500*100);//0.5秒发指令
-
-            write(fifo_fd1,"get_time_pos\n", strlen("get_time_pos\n"));
-//            sem_post(sem);
+            usleep(500*100);//0.05秒发指令
+            SendMsgToMplayer("get_percent_pos\n");
+            usleep(500*100);//0.05秒发指令
+            SendMsgToMplayer("get_time_pos\n");
            pthread_mutex_unlock(&mutex);
-           usleep(500*100);
-
+           usleep(500*100);//0.05秒发指令
         }
     }
-
-
 void MainWindow::MusicFront()
 {
     if(ui->listWidget->currentRow() == 0)//当光标在第一个文件时，点击上一个光标移动到最下面的文件，不播放
@@ -261,12 +208,9 @@ void MainWindow::MusicFront()
     {
         ui->listWidget->setCurrentRow(ui->listWidget->currentRow()-1);
     }
-    char buff[128]= "loadfile ../MyQT_Mplayer_Project/song/";
-    QByteArray ba = ui->listWidget->currentItem()->text().toUtf8();
-    strcpy(buf,ba.data());
-    strcat(buff,buf);
-    strcat(buff,"\n");
-    write(fd,buff,strlen(buff));
+    char buff[128]= {0};
+    sprintf(buff,"loadfile \"../MyQT_Mplayer_Project/song/%s\"\n",QStringToChar(ui->listWidget->currentItem()->text()));
+    SendMsgToMplayer(buff);
     printf("%s\n",buff);
     fflush(stdout);
 }
@@ -280,16 +224,12 @@ void MainWindow::MusicNext()
     {
         ui->listWidget->setCurrentRow(ui->listWidget->currentRow()+1);
     }
-    char buff[128]= "loadfile ../MyQT_Mplayer_Project/song/";
-    QByteArray ba = ui->listWidget->currentItem()->text().toUtf8();
-    strcpy(buf,ba.data());
-    strcat(buff,buf);
-    strcat(buff,"\n");
-    write(fd,buff,strlen(buff));
+    char buff[128]= {0};
+    sprintf(buff,"loadfile \"../MyQT_Mplayer_Project/song/%s\"\n",QStringToChar(ui->listWidget->currentItem()->text()));
+    SendMsgToMplayer(buff);
     printf("%s\n",buff);
     fflush(stdout);
 }
-
 // clicke the pause button
 void MainWindow::MyClickedPlaying()
 {
@@ -298,39 +238,30 @@ void MainWindow::MyClickedPlaying()
       {
         PuaesFlag = 1;
         pthread_mutex_lock(&mutex);
-        write(fd,"pause\n",strlen ("pause\n"));
- //       sem_wait(sem);
+        SendMsgToMplayer("pause\n");
         printf("wo gai le");
         fflush(stdout);
     }
     else {
-        write(fd,"pause\n",strlen ("pause\n"));
+        SendMsgToMplayer("pause\n");
         PuaesFlag = 0;
        pthread_mutex_unlock(&mutex);
- //       sem_post(sem);
         printf("%d \n",PuaesFlag);
         fflush(stdout);
     }
-//    std::for_each(QListSongName.begin(),QListSongName.end(),[=](char *val){
-//        printf("%s\n",val);
-//        fflush(stdout);
-//
-//    });
-
 }
-
 void MainWindow::MyDoubleClickedList(const QModelIndex &index)
 {
     char buff[128]= "loadfile ../MyQT_Mplayer_Project/song/";
-    QByteArray ba = ui->listWidget->currentItem()->text().toUtf8();
-    strcpy(buf,ba.data());
-    strcat(buff,buf);
-    strcat(buff,"\n");
-    write(fd,buff,strlen(buff));
+    sprintf(buff,"loadfile \"../MyQT_Mplayer_Project/song/%s\"\n",QStringToChar(ui->listWidget->currentItem()->text()));
+//    QByteArray ba = ui->listWidget->currentItem()->text().toUtf8();
+//    strcpy(buf,ba.data());
+//    strcat(buff,buf);
+//    strcat(buff,"\n");
+//    write(fd,buff,strlen(buff));
     printf("%s\n",buff);
    fflush(stdout);
 }
-
 void SetSeekBarFindViewById(int val)
 {
     setseekbarfindviewbyid = val;
@@ -354,8 +285,13 @@ void SetNowTimeQstring(float val)
    sprintf(buff,"%02d:%02d",minute,second);
    setnowtimeqstring = QString(buff);
 }
-
-
-
-
-
+void SendMsgToMplayer(char *val)
+{
+   int fd = open("fifo_cmd",O_RDWR);
+    write(fd,val,strlen(val));
+}
+char *QStringToChar(QString val)
+{
+    QByteArray ba = val.toUtf8();
+    return ba.data();
+}

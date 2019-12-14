@@ -34,12 +34,14 @@ typedef   struct
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
-extern void *Mydeal_fun(void *arg);
-extern void *deal_fun2(void *arg);
+extern void *MyGetTimeAndBar(void *arg);
+extern void *MySendMsgToMplayer(void *arg);
 extern void SetSeekBarFindViewById(int val);
 extern void SetNowTime(float val);
 extern void TotalTime(float val);
 extern void SetNowTimeQstring(float val);
+extern void SendMsgToMplayer(char *val);
+extern char *QStringToChar(QString val);
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -49,7 +51,6 @@ public:
     ~MainWindow();
     void InitializeListFunction();
     void MyCutSong();
-    int GetPuaesFlag();
     int fd;
 //    sem_t *sem;
     char buf[128];

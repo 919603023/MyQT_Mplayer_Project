@@ -33,26 +33,16 @@ int main(int argc, char *argv[])
     else{
      int fd = open("fifo_cmd",O_WRONLY);
        pthread_t mplayer_ack;
-       pthread_create(&mplayer_ack,NULL,Mydeal_fun , (void *)(fd1[0]));
+       pthread_create(&mplayer_ack,NULL,MyGetTimeAndBar,(void *)(fd1[0]));
     pthread_detach(mplayer_ack);
     pthread_t send_mplayer;
-    pthread_create(&send_mplayer,NULL,deal_fun2 , (void *)fd);
+    pthread_create(&send_mplayer,NULL,MySendMsgToMplayer,(void *)fd);
     pthread_detach(send_mplayer);
-
-
     QApplication a(argc, argv);
+
     MainWindow w;
     w.show();
     w.pid = pid;
-
-//    while(1)
-//    {
-//        mkfifo("fifo_setbar",0664);
-//        int fdsetbar = open("fifo_setbar",O_RDWR);
-//        int val;
-//        read(fdsetbar,&val,sizeof(int));
-//        w.SetSeekbarfindViewById(val);
-//    }
     return a.exec();
     }
 }
