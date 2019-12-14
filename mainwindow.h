@@ -59,6 +59,7 @@ public:
     char buf[128];
     int OpenFlag;
     int CutSong;
+    int Volue;
     pid_t pid;
     int HaveLyricFlag;
     lyric *Lyric[128];
@@ -70,6 +71,7 @@ public:
     void  closeEvent(QCloseEvent *event);
     void MusicNext();
     void MusicFront();
+    void  resizeEvent(QResizeEvent *);
 
 
 signals:

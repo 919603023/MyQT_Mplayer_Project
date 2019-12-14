@@ -14,6 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
+//  ui->widget->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
     for(int i = 0;i < 128;i++)
     {
         lyric *val = (lyric*)malloc(sizeof (int)+128);
@@ -90,11 +91,23 @@ MainWindow::MainWindow(QWidget *parent)
         fflush(stdout);
         ui->progress_bar->setValue(setseekbarfindviewbyid);
         ui->label_nowtime->setText(setnowtimeqstring);
+
+        if(PuaesFlag == 1)
+        {
+
+        }
+        else
+        {
+            char buff[128] ={0};
+            sprintf(buff,"volume %d 1\n",ui->spinBox_huds->value());
+            SendMsgToMplayer(buff);
+        }
         if(HaveLyricFlag == 1)
         {
             if(strcmp(MyFindLyric(), "__nohave") != 0)
             {
                ui->label_lyric->setText(MyFindLyric());
+
             }
 
         }
@@ -263,6 +276,16 @@ void MainWindow::MyDoubleClickedList(const QModelIndex &index)
     sprintf(buff,"loadfile \"../MyQT_Mplayer_Project/song/%s\"\n",QStringToChar(ui->listWidget->currentItem()->text()));
     printf("%s\n",buff);
    fflush(stdout);
+}
+void MainWindow::resizeEvent(QResizeEvent *)
+{
+    QPalette    palette = this->palette();
+    QPixmap    pixmap("");
+       palette.setBrush(this->backgroundRole(),
+                         QBrush(pixmap.scaled(this->size(),
+                                Qt::IgnoreAspectRatio,
+                                Qt::SmoothTransformation)));
+         this->setPalette(palette);
 }
 void SetSeekBarFindViewById(int val)
 {
