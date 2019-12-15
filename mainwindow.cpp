@@ -118,19 +118,8 @@ void MainWindow::MusicFront()
     printf("%s\n",buff);
     fflush(stdout);
     MyCutSong();
+    Unlock();
 
-}
-
-void MainWindow::TimeOut()
-{
-    SetInformation();
-    PrintInformation();
-    if(PuaesFlag == 0)
-    {
-       char buff[128];
-       sprintf(buff,"volume %d 1\n",viewinformation.hub);
-       SendMsgToMplayer(buff);
-    }
 }
 void MainWindow::MusicNext()
 {
@@ -149,7 +138,19 @@ void MainWindow::MusicNext()
     printf("%s\n",buff);
     fflush(stdout);
     MyCutSong();
+    Unlock();
 
+}
+void MainWindow::TimeOut()
+{
+    SetInformation();
+    PrintInformation();
+    if(PuaesFlag == 0)
+    {
+       char buff[128];
+       sprintf(buff,"volume %d 1\n",viewinformation.hub);
+       SendMsgToMplayer(buff);
+    }
 }
 // clicke the pause button
 void MainWindow::MyClickedPlaying()
@@ -157,20 +158,14 @@ void MainWindow::MyClickedPlaying()
 
     if(PuaesFlag == 0)
       {
-        PuaesFlag = 1;
-        pthread_mutex_lock(&mutex);
-        SendMsgToMplayer("pause\n");
-        printf("wo gai le");
-        fflush(stdout);
+
+        Lock();
     }
     else {
-        SendMsgToMplayer("pause\n");
-        PuaesFlag = 0;
-       pthread_mutex_unlock(&mutex);
-        printf("%d \n",PuaesFlag);
-        fflush(stdout);
+
+        Unlock();
     }
-    //    MyCutSong();
+
 }
 
 void MainWindow::MyDoubleClickedList(QListWidgetItem *item)
@@ -184,6 +179,7 @@ void MainWindow::MyDoubleClickedList(QListWidgetItem *item)
             printf("%s\n",buff);
            fflush(stdout);
            MyCutSong();
+           Unlock();
 
 }
 void MainWindow::resizeEvent(QResizeEvent *)
@@ -196,7 +192,6 @@ void MainWindow::resizeEvent(QResizeEvent *)
                                 Qt::SmoothTransformation)));
        this->setPalette(palette);
 }
-
 void MainWindow::ReadDir(char *val)
 {
     DIR *dir = opendir(val);
@@ -234,7 +229,6 @@ void MainWindow::ReadDir(char *val)
 
     closedir(dir);
 }
-
 void MainWindow::Initialize()
 {
     for(int i = 0;i < 128;i++)
@@ -271,7 +265,6 @@ void MainWindow::Initialize()
     ReadDir("../MyQT_Mplayer_Project/song/");
 
 }
-
 void MainWindow::PrintInformation()
 {
    ui->huds->setValue(viewinformation.hub);
@@ -283,7 +276,6 @@ void MainWindow::PrintInformation()
    ui->label_totaltime->setText(QString(viewinformation.alltime));
    ui->progress_bar->setValue(viewinformation.progress);
 }
-
 void MainWindow::SetInformation()
 {
     viewinformation.hub =  ui->spinBox_huds->value();
@@ -309,18 +301,6 @@ void MainWindow::SetInformation()
       viewinformation.lyric = "No have lyric";
     }
 }
-void SetSeekBarFindViewById(int val)
-{
-    setseekbarfindviewbyid = val;
-}
-void SetNowTime(float val)
-{
-    setnowtime = val;
-}
-void TotalTime(float val)
-{
-    totaltime = val;
-}
 void MainWindow::SetTimeQstring(float val,QString &val1)
 {
     char buff[128] = {0};
@@ -331,6 +311,18 @@ void MainWindow::SetTimeQstring(float val,QString &val1)
    int msec = ((int)(val*10))%10;
    sprintf(buff,"%02d:%02d",minute,second);
    val1 = QString(buff);
+}
+void MainWindow::Lock()
+{
+    PuaesFlag = 1;
+    pthread_mutex_lock(&mutex);
+    SendMsgToMplayer("pause\n");
+}
+void MainWindow::Unlock()
+{
+    SendMsgToMplayer("pause\n");
+    PuaesFlag = 0;
+   pthread_mutex_unlock(&mutex);
 }
 void SendMsgToMplayer(char *val)
 {
@@ -343,7 +335,6 @@ char *QStringToChar(QString val)
     QByteArray ba = val.toUtf8();
     return ba.data();
 }
-
 void *MySendMsgToMplayer(void *arg)
 {
     usleep(200*10000+800000);
@@ -414,4 +405,16 @@ void *MyGetTimeAndBar(void *arg)
             }
               fflush(stdout);
         }
+}
+void SetSeekBarFindViewById(int val)
+{
+    setseekbarfindviewbyid = val;
+}
+void SetNowTime(float val)
+{
+    setnowtime = val;
+}
+void TotalTime(float val)
+{
+    totaltime = val;
 }

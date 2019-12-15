@@ -86,6 +86,8 @@ public:
     void PrintInformation();
     void SetInformation();
     void SetTimeQstring(float val,QString &val1);
+    void Lock();
+    void Unlock();
 signals:
 
 public slots:
