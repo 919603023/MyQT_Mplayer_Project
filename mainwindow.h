@@ -27,6 +27,7 @@
 #include <numeric>
 #include <iostream>
 #include <QTextCodec>
+#include <QListWidgetItem>
 typedef   struct
 {
     int time;
@@ -38,7 +39,7 @@ struct ViewInformation
     QString singer;
     QString album;
     QString nowtime;
-    int alltime;
+    QString alltime;
     QString lyric;
     int progress;
     int hub;
@@ -78,19 +79,21 @@ public:
     ViewInformation viewinformation;
     lyric StructLyric;
     void  closeEvent(QCloseEvent *event);
-    void MusicNext();
-    void MusicFront();
+
     void  resizeEvent(QResizeEvent *);
     void ReadDir(char *val);
     void Initialize();
     void PrintInformation();
     void SetInformation();
-    void SetNowTimeQstring(float val);
+    void SetTimeQstring(float val,QString &val1);
 signals:
 
 public slots:
-   void MyClickedPlaying();
-   void MyDoubleClickedList(const QModelIndex &index);
+   void MyClickedPlaying(void);
+   void MyDoubleClickedList(QListWidgetItem *item);
+   void MusicNext(void);
+   void MusicFront(void);
+   void TimeOut(void);
 private:
     Ui::MainWindow *ui;
 

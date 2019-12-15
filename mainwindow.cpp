@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-QString SONGNAME;
 QString ARTIST;
 int LENGTH;
 int AllTime = 0;
@@ -24,53 +23,19 @@ MainWindow::MainWindow(QWidget *parent)
     QTimer *time = new QTimer(this);
     time->start(100);
     connect(ui->huds, &QSlider::valueChanged, ui->spinBox_huds, &QSpinBox::setValue);
-    connect(ui->huds,&QSlider::valueChanged,[=]{
-
-    });
        //当改变选值框的值时，同时进度条也改变位置
-  //  void (QSpinBox::*mysignal)(int) = &QSpinBox::valueChanged;
-
     connect(ui->pushButton_pause,SIGNAL(clicked()),this,SLOT(MyClickedPlaying()));
+    connect(ui->listWidget,SIGNAL(itemDoubleClicked(QListWidgetItem*)),this,SLOT(MyDoubleClickedList(QListWidgetItem *)));
+    connect(ui->pushButton_last,SIGNAL(clicked()),this,SLOT(MusicFront()));
+    connect(ui->pushButton_next,SIGNAL(clicked()),this,SLOT(MusicNext()));
+    connect(time,SIGNAL(timeout()),this,SLOT(TimeOut()));
 
-    //list fflush button
-//    connect(ui->pushButton,&QPushButton::clicked,[=]{
-//        ReadDir("../MyQT_Mplayer_Project/song/");
-//            MyCutSong();
-//    });
-    connect(ui->listWidget,&QListWidget::doubleClicked,[=]{
-        char buff[128]= "";
-        strcpy(buf,QStringToChar(ui->listWidget->currentItem()->text()));
-        printf("%s\n",buf);
-        fflush(stdout);
-        sprintf(buff,"loadfile \"../MyQT_Mplayer_Project/song/%s\"\n",buf);
-        SendMsgToMplayer(buff);
-        printf("%s\n",buff);
-       fflush(stdout);
-       MyCutSong();
-    });
-//    connect(ui->listWidget,SIGNAL(doubleClicked(const QModelIndex &)),this,SLOT(MyDoubleClickedList(const QModelIndex &index)));
-    connect(ui->pushButton_last,&QPushButton::clicked,[=]{
-        MusicFront();
-    });
-    connect(ui->pushButton_next,&QPushButton::clicked,[=]{
-        MusicNext();
-    });
-    connect(time, &QTimer::timeout, [=](){
-         SetInformation();
-         PrintInformation();
-         if(PuaesFlag == 0)
-         {
-            char buff[128];
-            sprintf(buff,"volume %d 1\n",viewinformation.hub);
-            SendMsgToMplayer(buff);
-         }
-        });
 }
 MainWindow::~MainWindow()
 {
     delete ui;
 }
-//the song list initialize
+
 
 void MainWindow::MyCutSong()
 {
@@ -155,6 +120,18 @@ void MainWindow::MusicFront()
     MyCutSong();
 
 }
+
+void MainWindow::TimeOut()
+{
+    SetInformation();
+    PrintInformation();
+    if(PuaesFlag == 0)
+    {
+       char buff[128];
+       sprintf(buff,"volume %d 1\n",viewinformation.hub);
+       SendMsgToMplayer(buff);
+    }
+}
 void MainWindow::MusicNext()
 {
     if(ui->listWidget->currentRow() == ui->listWidget->count()-1)
@@ -193,14 +170,21 @@ void MainWindow::MyClickedPlaying()
         printf("%d \n",PuaesFlag);
         fflush(stdout);
     }
-//    MyCutSong();
+    //    MyCutSong();
 }
-void MainWindow::MyDoubleClickedList(const QModelIndex &index)
+
+void MainWindow::MyDoubleClickedList(QListWidgetItem *item)
 {
-    char buff[128]= "loadfile ../MyQT_Mplayer_Project/song/";
-    sprintf(buff,"loadfile \"../MyQT_Mplayer_Project/song/%s\"\n",QStringToChar(ui->listWidget->currentItem()->text()));
-    printf("%s\n",buff);
-   fflush(stdout);
+            char buff[128]= "";
+            strcpy(buf,QStringToChar(item->text()));
+            printf("%s\n",buf);
+            fflush(stdout);
+            sprintf(buff,"loadfile \"../MyQT_Mplayer_Project/song/%s\"\n",buf);
+            SendMsgToMplayer(buff);
+            printf("%s\n",buff);
+           fflush(stdout);
+           MyCutSong();
+
 }
 void MainWindow::resizeEvent(QResizeEvent *)
 {
@@ -270,6 +254,15 @@ void MainWindow::Initialize()
     }
     ui->spinBox_huds->setValue(99);
     ui->huds->setValue(99);
+    ui->label_lyric->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
+    ui->label_song->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
+    ui->label_album->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
+    ui->label_singer->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
+    ui->label_nowtime->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
+    ui->label_songname->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
+    ui->label_albumname->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
+    ui->label_totaltime->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
+    ui->label_singername->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
     bzero(buf,sizeof(buf));
     ReadDir("../MyQT_Mplayer_Project/song/");
 
@@ -290,13 +283,16 @@ void MainWindow::PrintInformation()
 void MainWindow::SetInformation()
 {
     viewinformation.hub =  ui->spinBox_huds->value();
-    SetNowTimeQstring(setnowtime);
-    viewinformation.alltime = LENGTH;
-    viewinformation.nowtime = setnowtimeqstring;
+    SetTimeQstring(setnowtime,viewinformation.nowtime);
+    SetTimeQstring(LENGTH,viewinformation.alltime);
+
+
+
     viewinformation.progress = setseekbarfindviewbyid;
-    viewinformation.song = SONGNAME;
+    viewinformation.song = buf;
     viewinformation.album = ALBUMNAME;
     viewinformation.singer = ARTIST;
+
     if(HaveLyricFlag == 1)
     {
         if(strcmp(MyFindLyric(), "__nohave") != 0)
@@ -321,7 +317,7 @@ void TotalTime(float val)
 {
     totaltime = val;
 }
-void MainWindow::SetNowTimeQstring(float val)
+void MainWindow::SetTimeQstring(float val,QString &val1)
 {
     char buff[128] = {0};
    int i = val;
@@ -330,7 +326,7 @@ void MainWindow::SetNowTimeQstring(float val)
    int second = i%60;
    int msec = ((int)(val*10))%10;
    sprintf(buff,"%02d:%02d",minute,second);
-   setnowtimeqstring = QString(buff);
+   val1 = QString(buff);
 }
 void SendMsgToMplayer(char *val)
 {
@@ -356,8 +352,6 @@ void *MySendMsgToMplayer(void *arg)
             usleep(500*100);//0.05秒发指令
             SendMsgToMplayer("get_time_pos\n");
             usleep(500*100);//0.05秒发指令
-            SendMsgToMplayer("get_file_name\n");
-            usleep(500*100);//0.05秒发指令
             SendMsgToMplayer("get_time_length\n");
             usleep(500*100);//0.05秒发指令
             SendMsgToMplayer("get_meta_artist\n");
@@ -369,7 +363,7 @@ void *MyGetTimeAndBar(void *arg)
 {
     char val[128] = "";
     char buf[128] = "";
-    int val1;
+    float val1;
     char cmd[128] = "";
         int fd = (int)(long)arg;
         while(1)
@@ -393,12 +387,6 @@ void *MyGetTimeAndBar(void *arg)
                   sscanf(buf,"%*[^=]=%f", &time_pos);
                   SetNowTime(time_pos);
             }
-            else if(strcmp(cmd,"ANS_FILENAME") == 0)
-            {
-
-                sscanf(buf,"%*[^=]='%s'",val);
-                SONGNAME = val;
-            }
             else if(strcmp(cmd,"ANS_META_ALBUM") == 0)
             {
 
@@ -414,7 +402,7 @@ void *MyGetTimeAndBar(void *arg)
             else if(strcmp(cmd,"ANS_LENGTH") == 0)
             {
 
-                sscanf(buf,"%*[^=]=%d",&val1);
+                sscanf(buf,"%*[^=]=%f",&val1);
                 LENGTH = val1;
             }
             else
