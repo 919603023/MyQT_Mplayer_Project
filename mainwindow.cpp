@@ -242,16 +242,16 @@ void MainWindow::Initialize()
         lyric *val = (lyric*)malloc(sizeof (int)+256);
         Lyric[i] = val;
     }
-    HaveLyricFlag = 0;
     fd = open("fifo_cmd",O_RDWR);
-
-    pthread_mutex_init(&mutex,NULL);
-    ui->setupUi(this);
-    OpenFlag = 0;
-    CutSong = 0;
     if(fd < 0){
          perror("open wronly fifo");
     }
+    OpenFlag = 0;
+    CutSong = 0;
+    pthread_mutex_init(&mutex,NULL);
+    ui->setupUi(this);
+    HaveLyricFlag = 0;
+    this->setFixedSize(800, 450);
     ui->spinBox_huds->setValue(99);
     ui->huds->setValue(99);
     ui->label_lyric->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
@@ -263,6 +263,10 @@ void MainWindow::Initialize()
     ui->label_albumname->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
     ui->label_totaltime->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
     ui->label_singername->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
+    ui->listWidget->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
+    ui->pushButton_last->setShortcut(QKeySequence(Qt::Key_Left));
+    ui->pushButton_next->setShortcut(QKeySequence(Qt::Key_Right));
+    ui->pushButton_pause->setShortcut(QKeySequence(Qt::Key_Space));
     bzero(buf,sizeof(buf));
     ReadDir("../MyQT_Mplayer_Project/song/");
 
