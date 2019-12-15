@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
                     " mplayer ",
                     "-slave", "-quiet","-idle",
                     "-input", "file=./fifo_cmd",
-                    "../MyQT_Mplayer_Project/song/coffee.mp3", NULL);
+                    "../MyQT_Mplayer_Project/res/stratvoice/hello_kugo.mp3", NULL);
     }
     else{
      int fd = open("fifo_cmd",O_WRONLY);

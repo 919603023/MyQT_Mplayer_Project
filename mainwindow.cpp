@@ -340,7 +340,7 @@ char *QStringToChar(QString val)
 
 void *MySendMsgToMplayer(void *arg)
 {
-    usleep(500*1000);
+    usleep(200*10000+500000);
     pthread_mutex_init(&mutex,NULL);
 //        int fifo_fd1 = (int)(long)arg;
         //不停的给fifo_cmd发送获取当前时间以及进度
