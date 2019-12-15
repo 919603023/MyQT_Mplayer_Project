@@ -6,6 +6,7 @@
 
 int main(int argc, char *argv[])
 {
+    pthread_mutex_init(&mutex,NULL);
     int ret = mkfifo("fifo_cmd",0664);
      int fd1[2];
      pipe(fd1);

@@ -55,7 +55,7 @@ extern void TotalTime(float val);
 extern void SetNowTimeQstring(float val);
 extern void SendMsgToMplayer(char *val);
 extern char *QStringToChar(QString val);
-
+extern pthread_mutex_t mutex;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -74,6 +74,7 @@ public:
     char MyBuff[128];
     int HaveLyricFlag;
     lyric *Lyric[128];
+    QString setnowtimeqstring ="";
     ViewInformation viewinformation;
     lyric StructLyric;
     void  closeEvent(QCloseEvent *event);
@@ -84,6 +85,7 @@ public:
     void Initialize();
     void PrintInformation();
     void SetInformation();
+    void SetNowTimeQstring(float val);
 signals:
 
 public slots:

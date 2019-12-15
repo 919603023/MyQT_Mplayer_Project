@@ -2,13 +2,14 @@
 #include "ui_mainwindow.h"
 QString SONGNAME;
 QString ARTIST;
+int LENGTH;
 int AllTime = 0;
 int PuaesFlag= 0;
 QString ALBUMNAME;
 int setseekbarfindviewbyid = 0;
 int setnowtime = 0;
 float totaltime = 0;
-QString setnowtimeqstring ="";
+
 //sem_t *sem;
 pthread_mutex_t mutex;
 QList<lyric*> Lyriclist;
@@ -64,8 +65,6 @@ MainWindow::MainWindow(QWidget *parent)
             SendMsgToMplayer(buff);
          }
         });
-
-
 }
 MainWindow::~MainWindow()
 {
@@ -292,6 +291,7 @@ void MainWindow::SetInformation()
 {
     viewinformation.hub =  ui->spinBox_huds->value();
     SetNowTimeQstring(setnowtime);
+    viewinformation.alltime = LENGTH;
     viewinformation.nowtime = setnowtimeqstring;
     viewinformation.progress = setseekbarfindviewbyid;
     viewinformation.song = SONGNAME;
@@ -321,7 +321,7 @@ void TotalTime(float val)
 {
     totaltime = val;
 }
-void SetNowTimeQstring(float val)
+void MainWindow::SetNowTimeQstring(float val)
 {
     char buff[128] = {0};
    int i = val;
@@ -346,9 +346,7 @@ char *QStringToChar(QString val)
 
 void *MySendMsgToMplayer(void *arg)
 {
-    usleep(200*10000+500000);
-    pthread_mutex_init(&mutex,NULL);
-//        int fifo_fd1 = (int)(long)arg;
+    usleep(200*10000+800000);
         //不停的给fifo_cmd发送获取当前时间以及进度
         while(1)
         {
@@ -357,18 +355,31 @@ void *MySendMsgToMplayer(void *arg)
             SendMsgToMplayer("get_percent_pos\n");
             usleep(500*100);//0.05秒发指令
             SendMsgToMplayer("get_time_pos\n");
+            usleep(500*100);//0.05秒发指令
+            SendMsgToMplayer("get_file_name\n");
+            usleep(500*100);//0.05秒发指令
+            SendMsgToMplayer("get_time_length\n");
+            usleep(500*100);//0.05秒发指令
+            SendMsgToMplayer("get_meta_artist\n");
            pthread_mutex_unlock(&mutex);
            usleep(500*100);//0.05秒发指令
         }
 }
 void *MyGetTimeAndBar(void *arg)
 {
+    char val[128] = "";
+    char buf[128] = "";
+    int val1;
+    char cmd[128] = "";
         int fd = (int)(long)arg;
         while(1)
         {
-            char buf[128] = "";
+            bzero(val,sizeof(val));
+            bzero(buf,sizeof (buf));
+            bzero(cmd,sizeof(cmd));
+            val1 =0;
             read(fd,buf,sizeof (buf));
-            char cmd[128] = "";
+
             sscanf(buf,"%[^=]",cmd);
             if(strcmp(cmd,"ANS_PERCENT_POSITION") == 0)//百分比
             {
@@ -384,21 +395,30 @@ void *MyGetTimeAndBar(void *arg)
             }
             else if(strcmp(cmd,"ANS_FILENAME") == 0)
             {
-                char val[128];
+
                 sscanf(buf,"%*[^=]='%s'",val);
                 SONGNAME = val;
             }
             else if(strcmp(cmd,"ANS_META_ALBUM") == 0)
             {
-                char val[128];
+
                 sscanf(buf,"%*[^=]='%s'",val);
                 ALBUMNAME = val;
             }
             else if(strcmp(cmd,"ANS_META_ARTIST") == 0)
             {
-                char val[128];
+
                 sscanf(buf,"%*[^=]='%s'",val);
                 ARTIST = val;
+            }
+            else if(strcmp(cmd,"ANS_LENGTH") == 0)
+            {
+
+                sscanf(buf,"%*[^=]=%d",&val1);
+                LENGTH = val1;
+            }
+            else
+            {
             }
               fflush(stdout);
         }
