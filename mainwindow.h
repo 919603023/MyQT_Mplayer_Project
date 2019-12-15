@@ -32,6 +32,18 @@ typedef   struct
     int time;
     char MyLyric[256];
 }lyric;
+struct ViewInformation
+{
+    QString song;
+    QString singer;
+    QString album;
+    QString nowtime;
+    int alltime;
+    QString lyric;
+    int progress;
+    int hub;
+};
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -59,10 +71,10 @@ public:
     int CutSong;
     int Volue;
     pid_t pid;
+    char MyBuff[128];
     int HaveLyricFlag;
     lyric *Lyric[128];
-    char MyBuff[128];
-    QList<char*> QListSongName;
+    ViewInformation viewinformation;
     lyric StructLyric;
     void  closeEvent(QCloseEvent *event);
     void MusicNext();
@@ -70,15 +82,13 @@ public:
     void  resizeEvent(QResizeEvent *);
     void ReadDir(char *val);
     void Initialize();
+    void PrintInformation();
+    void SetInformation();
 signals:
 
 public slots:
    void MyClickedPlaying();
    void MyDoubleClickedList(const QModelIndex &index);
-
-
-
-
 private:
     Ui::MainWindow *ui;
 

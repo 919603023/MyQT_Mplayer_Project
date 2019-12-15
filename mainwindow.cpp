@@ -1,8 +1,10 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-
-
+QString SONGNAME;
+QString ARTIST;
+int AllTime = 0;
 int PuaesFlag= 0;
+QString ALBUMNAME;
 int setseekbarfindviewbyid = 0;
 int setnowtime = 0;
 float totaltime = 0;
@@ -22,12 +24,7 @@ MainWindow::MainWindow(QWidget *parent)
     time->start(100);
     connect(ui->huds, &QSlider::valueChanged, ui->spinBox_huds, &QSpinBox::setValue);
     connect(ui->huds,&QSlider::valueChanged,[=]{
-        char buff[128] ={0};
-        sprintf(buff,"volume %d 1\n",ui->spinBox_huds->value());
-        if(PuaesFlag == 0)
-        {
-         SendMsgToMplayer(buff);
-        }
+
     });
        //当改变选值框的值时，同时进度条也改变位置
   //  void (QSpinBox::*mysignal)(int) = &QSpinBox::valueChanged;
@@ -51,10 +48,6 @@ MainWindow::MainWindow(QWidget *parent)
        MyCutSong();
     });
 //    connect(ui->listWidget,SIGNAL(doubleClicked(const QModelIndex &)),this,SLOT(MyDoubleClickedList(const QModelIndex &index)));
-
-//strcpy(buf,QStringToChar(ui->listWidget);
-
-//    MyCutSong();
     connect(ui->pushButton_last,&QPushButton::clicked,[=]{
         MusicFront();
     });
@@ -62,36 +55,14 @@ MainWindow::MainWindow(QWidget *parent)
         MusicNext();
     });
     connect(time, &QTimer::timeout, [=](){
-        SetNowTimeQstring(setnowtime);
-
-        fflush(stdout);
-        ui->progress_bar->setValue(setseekbarfindviewbyid);
-        ui->label_nowtime->setText(setnowtimeqstring);
-
-        if(PuaesFlag == 1)
-        {
-
-        }
-        else
-        {
-            char buff[128] ={0};
-            sprintf(buff,"volume %d 1\n",ui->spinBox_huds->value());
+         SetInformation();
+         PrintInformation();
+         if(PuaesFlag == 0)
+         {
+            char buff[128];
+            sprintf(buff,"volume %d 1\n",viewinformation.hub);
             SendMsgToMplayer(buff);
-        }
-        if(HaveLyricFlag == 1)
-        {
-            if(strcmp(MyFindLyric(), "__nohave") != 0)
-            {
-               ui->label_lyric->setText(MyFindLyric());
-
-            }
-
-        }
-        else
-        {
-            ui->label_lyric->setText("No have lyric");
-        }
-
+         }
         });
 
 
@@ -144,6 +115,7 @@ void MainWindow::MyCutSong()
       }
   HaveLyricFlag = 1;
   fclose(MyFd);
+  viewinformation.lyric = buf;
 }
 
 char* MainWindow::MyFindLyric()
@@ -303,6 +275,40 @@ void MainWindow::Initialize()
     ReadDir("../MyQT_Mplayer_Project/song/");
 
 }
+
+void MainWindow::PrintInformation()
+{
+   ui->huds->setValue(viewinformation.hub);
+   ui->label_songname->setText(viewinformation.song);
+   ui->label_singername->setText(viewinformation.singer);
+   ui->label_albumname->setText(viewinformation.album);
+   ui->label_lyric->setText(viewinformation.lyric);
+   ui->label_nowtime->setText(viewinformation.nowtime);
+   ui->label_totaltime->setText(QString(viewinformation.alltime));
+   ui->progress_bar->setValue(viewinformation.progress);
+}
+
+void MainWindow::SetInformation()
+{
+    viewinformation.hub =  ui->spinBox_huds->value();
+    SetNowTimeQstring(setnowtime);
+    viewinformation.nowtime = setnowtimeqstring;
+    viewinformation.progress = setseekbarfindviewbyid;
+    viewinformation.song = SONGNAME;
+    viewinformation.album = ALBUMNAME;
+    viewinformation.singer = ARTIST;
+    if(HaveLyricFlag == 1)
+    {
+        if(strcmp(MyFindLyric(), "__nohave") != 0)
+        {
+           viewinformation.lyric= MyFindLyric();
+        }
+    }
+    else
+    {
+      viewinformation.lyric = "No have lyric";
+    }
+}
 void SetSeekBarFindViewById(int val)
 {
     setseekbarfindviewbyid = val;
@@ -375,6 +381,24 @@ void *MyGetTimeAndBar(void *arg)
                  float time_pos = 0;
                   sscanf(buf,"%*[^=]=%f", &time_pos);
                   SetNowTime(time_pos);
+            }
+            else if(strcmp(cmd,"ANS_FILENAME") == 0)
+            {
+                char val[128];
+                sscanf(buf,"%*[^=]='%s'",val);
+                SONGNAME = val;
+            }
+            else if(strcmp(cmd,"ANS_META_ALBUM") == 0)
+            {
+                char val[128];
+                sscanf(buf,"%*[^=]='%s'",val);
+                ALBUMNAME = val;
+            }
+            else if(strcmp(cmd,"ANS_META_ARTIST") == 0)
+            {
+                char val[128];
+                sscanf(buf,"%*[^=]='%s'",val);
+                ARTIST = val;
             }
               fflush(stdout);
         }
