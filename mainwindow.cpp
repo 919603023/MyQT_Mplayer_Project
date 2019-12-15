@@ -15,23 +15,11 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
 //  ui->widget->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
-    for(int i = 0;i < 128;i++)
-    {
-        lyric *val = (lyric*)malloc(sizeof (int)+128);
-        Lyric[i] = val;
-    }
-    HaveLyricFlag = 0;
-    fd = open("fifo_cmd",O_RDWR);
+
+    Initialize();
+
     QTimer *time = new QTimer(this);
     time->start(100);
-    pthread_mutex_init(&mutex,NULL);
-    ui->setupUi(this);
-    OpenFlag = 0;
-    CutSong = 0;
-    if(fd < 0){
-         perror("open wronly fifo");
-    }
-
     connect(ui->huds, &QSlider::valueChanged, ui->spinBox_huds, &QSpinBox::setValue);
     connect(ui->huds,&QSlider::valueChanged,[=]{
         char buff[128] ={0};
@@ -42,42 +30,30 @@ MainWindow::MainWindow(QWidget *parent)
         }
     });
        //当改变选值框的值时，同时进度条也改变位置
-    void (QSpinBox::*mysignal)(int) = &QSpinBox::valueChanged;
-    bzero(buf,sizeof(buf));
+  //  void (QSpinBox::*mysignal)(int) = &QSpinBox::valueChanged;
+
     connect(ui->pushButton_pause,SIGNAL(clicked()),this,SLOT(MyClickedPlaying()));
 
     //list fflush button
-    connect(ui->pushButton,&QPushButton::clicked,[=]{
-        DIR *dir = opendir("../MyQT_Mplayer_Project/song");
-        int i = 0;
-        ui->listWidget->clear();
-        while (1) {
-            struct dirent* dirp = readdir(dir);
-            if(dirp == NULL){
-                break;
-            }
-            else if(dirp->d_type ==  DT_REG){
-                ui->listWidget->addItem(new QListWidgetItem(dirp->d_name));
-            }
-            i++;
-            }
-            OpenFlag = 1;
-            closedir(dir);
-            MyCutSong();
-    });
+//    connect(ui->pushButton,&QPushButton::clicked,[=]{
+//        ReadDir("../MyQT_Mplayer_Project/song/");
+//            MyCutSong();
+//    });
     connect(ui->listWidget,&QListWidget::doubleClicked,[=]{
         char buff[128]= "";
         strcpy(buf,QStringToChar(ui->listWidget->currentItem()->text()));
+        printf("%s\n",buf);
+        fflush(stdout);
         sprintf(buff,"loadfile \"../MyQT_Mplayer_Project/song/%s\"\n",buf);
         SendMsgToMplayer(buff);
         printf("%s\n",buff);
        fflush(stdout);
        MyCutSong();
-
-
     });
 //    connect(ui->listWidget,SIGNAL(doubleClicked(const QModelIndex &)),this,SLOT(MyDoubleClickedList(const QModelIndex &index)));
-    InitializeListFunction();
+
+//strcpy(buf,QStringToChar(ui->listWidget);
+
 //    MyCutSong();
     connect(ui->pushButton_last,&QPushButton::clicked,[=]{
         MusicFront();
@@ -87,7 +63,7 @@ MainWindow::MainWindow(QWidget *parent)
     });
     connect(time, &QTimer::timeout, [=](){
         SetNowTimeQstring(setnowtime);
-        printf("this time is  %f\n",setnowtime);
+
         fflush(stdout);
         ui->progress_bar->setValue(setseekbarfindviewbyid);
         ui->label_nowtime->setText(setnowtimeqstring);
@@ -118,37 +94,14 @@ MainWindow::MainWindow(QWidget *parent)
 
         });
 
-ui->spinBox_huds->setValue(99);
-ui->huds->setValue(99);
+
 }
 MainWindow::~MainWindow()
 {
     delete ui;
 }
 //the song list initialize
-void MainWindow::InitializeListFunction()
-{
-    DIR *dir = opendir("../MyQT_Mplayer_Project/song");
-    int i = 0;
-    ui->listWidget->clear();
-    ui->listWidget->setCurrentRow(0);
-    while (1) {
-        struct dirent* dirp = readdir(dir);
 
-        if(dirp == NULL){
-            break;
-        }
-        else if(dirp->d_type == DT_REG){
-            ui->listWidget->addItem(new QListWidgetItem(dirp->d_name));
-            strcpy(buf,dirp->d_name);
-//            char *buff1 = (char*)malloc(128);
-//            strcpy(buff1,buf);
-//            QListSongName.push_back(buff1);
-        }
-        i++;
-        }
-    closedir(dir);
-}
 void MainWindow::MyCutSong()
 {
 
@@ -183,8 +136,9 @@ void MainWindow::MyCutSong()
       fflush(stdout);
       strcpy(Lyric[i-4]->MyLyric,buff) ;
       Lyric[i-4]->time = val1*600+val2*10;
-      fflush(stdout);
+      printf("*\n ",buff);fflush(stdout);
        Lyriclist.push_back(Lyric[i-4]);
+       printf("&\n ",buff);fflush(stdout);
       }
       i++;
       }
@@ -280,12 +234,74 @@ void MainWindow::MyDoubleClickedList(const QModelIndex &index)
 void MainWindow::resizeEvent(QResizeEvent *)
 {
     QPalette    palette = this->palette();
-    QPixmap    pixmap("");
+    QPixmap    pixmap(":/res/img/bg.jpg");
        palette.setBrush(this->backgroundRole(),
                          QBrush(pixmap.scaled(this->size(),
                                 Qt::IgnoreAspectRatio,
                                 Qt::SmoothTransformation)));
-         this->setPalette(palette);
+       this->setPalette(palette);
+}
+
+void MainWindow::ReadDir(char *val)
+{
+    DIR *dir = opendir(val);
+    int i = 0;
+    ui->listWidget->clear();
+    while (1) {
+        struct dirent* dirp = readdir(dir);
+        if(dirp == NULL){
+            break;
+        }
+        else if(dirp->d_type ==  DT_REG){
+            if(strcmp(&(dirp->d_name[strlen(dirp->d_name)-3]),".mp3"))
+            {
+                ui->listWidget->addItem(new QListWidgetItem(dirp->d_name));
+                if(i == 0)
+                {
+                    i++;
+                    strcpy(buf,dirp->d_name);
+                }
+
+            if(strcmp(dirp->d_name,buf) == 0)
+            {
+                ui->listWidget->setCurrentRow(3);
+            }
+            else
+            {
+                ui->listWidget->setCurrentRow(0);
+            }
+            }
+
+        }
+
+        }
+
+
+    closedir(dir);
+}
+
+void MainWindow::Initialize()
+{
+    for(int i = 0;i < 128;i++)
+    {
+        lyric *val = (lyric*)malloc(sizeof (int)+256);
+        Lyric[i] = val;
+    }
+    HaveLyricFlag = 0;
+    fd = open("fifo_cmd",O_RDWR);
+
+    pthread_mutex_init(&mutex,NULL);
+    ui->setupUi(this);
+    OpenFlag = 0;
+    CutSong = 0;
+    if(fd < 0){
+         perror("open wronly fifo");
+    }
+    ui->spinBox_huds->setValue(99);
+    ui->huds->setValue(99);
+    bzero(buf,sizeof(buf));
+    ReadDir("../MyQT_Mplayer_Project/song/");
+
 }
 void SetSeekBarFindViewById(int val)
 {

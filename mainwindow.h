@@ -30,7 +30,7 @@
 typedef   struct
 {
     int time;
-    char MyLyric[128];
+    char MyLyric[256];
 }lyric;
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -51,11 +51,9 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    void InitializeListFunction();
     void MyCutSong();
     char*MyFindLyric();
     int fd;
-//    sem_t *sem;
     char buf[128];
     int OpenFlag;
     int CutSong;
@@ -64,16 +62,14 @@ public:
     int HaveLyricFlag;
     lyric *Lyric[128];
     char MyBuff[128];
-
-//    int PuaesFlag;
     QList<char*> QListSongName;
     lyric StructLyric;
     void  closeEvent(QCloseEvent *event);
     void MusicNext();
     void MusicFront();
     void  resizeEvent(QResizeEvent *);
-
-
+    void ReadDir(char *val);
+    void Initialize();
 signals:
 
 public slots:
