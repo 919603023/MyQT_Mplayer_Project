@@ -43,6 +43,8 @@ struct ViewInformation
     QString lyric;
     int progress;
     int hub;
+    int NowTime;
+    int AllTime;
 };
 
 QT_BEGIN_NAMESPACE
@@ -51,7 +53,6 @@ QT_END_NAMESPACE
 extern void *MyGetTimeAndBar(void *arg);
 extern void *MySendMsgToMplayer(void *arg);
 extern void SetSeekBarFindViewById(int val);
-extern void SetNowTime(float val);
 extern void TotalTime(float val);
 extern void SetNowTimeQstring(float val);
 extern void SendMsgToMplayer(char *val);

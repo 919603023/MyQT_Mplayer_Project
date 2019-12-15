@@ -1,13 +1,13 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-QString ARTIST;
-int LENGTH;
-int AllTime = 0;
+//QString ARTIST;
+//int LENGTH;
+//int AllTime = 0;
 int PuaesFlag= 0;
-QString ALBUMNAME;
-int setseekbarfindviewbyid = 0;
-int setnowtime = 0;
-float totaltime = 0;
+//QString ALBUMNAME;
+//int setseekbarfindviewbyid = 0;
+//int setnowtime = 0;
+//float totaltime = 0;
 
 //sem_t *sem;
 pthread_mutex_t mutex;
@@ -86,7 +86,7 @@ char* MainWindow::MyFindLyric()
 {
     strcpy(MyBuff,"__nohave");
     std::for_each(Lyriclist.begin(),Lyriclist.end(),[=](lyric* val ){
-        if((int)(setnowtime*10) == val->time)
+        if((int)(viewinformation.NowTime *10) == val->time)
         {
             printf("%s\n",val->MyLyric);
             fflush(stdout);
@@ -279,16 +279,7 @@ void MainWindow::PrintInformation()
 void MainWindow::SetInformation()
 {
     viewinformation.hub =  ui->spinBox_huds->value();
-    SetTimeQstring(setnowtime,viewinformation.nowtime);
-    SetTimeQstring(LENGTH,viewinformation.alltime);
-
-
-
-    viewinformation.progress = setseekbarfindviewbyid;
     viewinformation.song = buf;
-    viewinformation.album = ALBUMNAME;
-    viewinformation.singer = ARTIST;
-
     if(HaveLyricFlag == 1)
     {
         if(strcmp(MyFindLyric(), "__nohave") != 0)
@@ -337,6 +328,8 @@ char *QStringToChar(QString val)
 }
 void *MySendMsgToMplayer(void *arg)
 {
+
+
     usleep(200*10000+800000);
         //不停的给fifo_cmd发送获取当前时间以及进度
         while(1)
@@ -360,7 +353,8 @@ void *MyGetTimeAndBar(void *arg)
     char buf[128] = "";
     float val1;
     char cmd[128] = "";
-        int fd = (int)(long)arg;
+     MainWindow *m = (MainWindow *)arg;
+       int fd  = open("Myfifo",O_RDONLY);
         while(1)
         {
             bzero(val,sizeof(val));
@@ -374,31 +368,38 @@ void *MyGetTimeAndBar(void *arg)
             {
                 int percent_pos = 0;
                 sscanf(buf,"%*[^=]=%d",&percent_pos);
-                SetSeekBarFindViewById(percent_pos);
+                m->viewinformation.progress = percent_pos;
+
             }
              else if(strcmp(cmd,"ANS_TIME_POSITION") == 0)//当前时间
             {
                  float time_pos = 0;
                   sscanf(buf,"%*[^=]=%f", &time_pos);
-                  SetNowTime(time_pos);
+
+                  m->SetTimeQstring(time_pos,m->viewinformation.nowtime);
+                  m->viewinformation.NowTime = time_pos;
             }
             else if(strcmp(cmd,"ANS_META_ALBUM") == 0)
             {
 
                 sscanf(buf,"%*[^=]='%s'",val);
-                ALBUMNAME = val;
+
+                m->viewinformation.album = val;
             }
             else if(strcmp(cmd,"ANS_META_ARTIST") == 0)
             {
 
                 sscanf(buf,"%*[^=]='%s'",val);
-                ARTIST = val;
+
+                m->viewinformation.singer = val;
             }
             else if(strcmp(cmd,"ANS_LENGTH") == 0)
             {
 
                 sscanf(buf,"%*[^=]=%f",&val1);
-                LENGTH = val1;
+
+                 m->SetTimeQstring(val1,m->viewinformation.alltime);
+                 m->viewinformation.AllTime = val1;
             }
             else
             {
@@ -406,15 +407,6 @@ void *MyGetTimeAndBar(void *arg)
               fflush(stdout);
         }
 }
-void SetSeekBarFindViewById(int val)
-{
-    setseekbarfindviewbyid = val;
-}
-void SetNowTime(float val)
-{
-    setnowtime = val;
-}
-void TotalTime(float val)
-{
-    totaltime = val;
-}
+
+
+
