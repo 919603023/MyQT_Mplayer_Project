@@ -79,11 +79,12 @@ public:
     int HaveLyricFlag;
     int SpliderPress;
     lyric *Lyric[128];
+    int ShowAllLyric;
     QString setnowtimeqstring ="";
     ViewInformation viewinformation;
     lyric StructLyric;
     void  closeEvent(QCloseEvent *event);
-
+void InsterListWidget(lyric *(&val));
     void  resizeEvent(QResizeEvent *);
     void ReadDir(char *val);
     void Initialize();
@@ -92,6 +93,7 @@ public:
     void SetTimeQstring(float val,QString &val1);
     void Lock();
     void Unlock();
+    void SetAllLyric();
 signals:
 
 public slots:

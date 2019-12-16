@@ -19,6 +19,21 @@ MainWindow::MainWindow(QWidget *parent)
 //  ui->widget->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
 
     Initialize();
+ShowAllLyric = 0;
+ui->listWidget_2->hide();
+connect(ui->pushButton_2,&QPushButton::clicked,[=]{
+if(ShowAllLyric == 0)
+{
+    ui->listWidget_2->show();
+    ShowAllLyric = 1;
+}
+else
+{
+    ui->listWidget_2->hide();
+    ShowAllLyric = 0;
+}
+});
+
 
     QTimer *time = new QTimer(this);
     time->start(100);
@@ -87,6 +102,7 @@ void MainWindow::MyCutSong()
   HaveLyricFlag = 1;
   fclose(MyFd);
   viewinformation.lyric = buf;
+  SetAllLyric();
 
 }
 
@@ -108,6 +124,11 @@ void MainWindow::closeEvent(QCloseEvent *event)
     char buff[128] = "";
     sprintf(buff,"kill -9 %d",pid);
     system(buff);
+}
+
+void MainWindow::InsterListWidget(lyric *&val)
+{
+    ui->listWidget->addItem(new QListWidgetItem(val->MyLyric));
 }
 
 
@@ -367,7 +388,25 @@ void MainWindow::Unlock()
 {
     SendMsgToMplayer("pause\n");
     PuaesFlag = 0;
-   pthread_mutex_unlock(&mutex);
+    pthread_mutex_unlock(&mutex);
+}
+
+void MainWindow::SetAllLyric()
+{
+    if(Lyriclist.count() != 0)
+    {
+ //       std::for_each(Lyriclist.begin(),Lyriclist.end(),MainWindow::InsterListWidget);
+
+        QList<lyric*>::iterator it = Lyriclist.begin();
+        while(it != Lyriclist.end())
+        {
+
+            printf("weifjowjefiajfijaewifj\n");
+            fflush(stdout);
+        ui->listWidget_2->addItem(new QListWidgetItem(QString(it.i->t()->MyLyric)));
+        it++;
+        }
+    }
 }
 void SendMsgToMplayer(char *val)
 {
