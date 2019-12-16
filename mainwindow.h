@@ -76,6 +76,7 @@ public:
     int OpenFlag;
     int CutSong;
     int Volue;
+    int MuteFlag;
     pid_t pid;
     char MyBuff[128];
     int HaveLyricFlag;
@@ -109,6 +110,8 @@ public slots:
    void SlotProgressValue(int val);
    void SlotSliderPressed(void);
    void SlotSliderReleased(void);
+   void SlotQPushButtonShowAllLyric(void);
+   void SlotQPushButtonvolume(void);
    void SlotQPushButtonMysignalsEnter(void);
    void SlotQPushButtonMysignalsLeave(void);
    void SlotQGroupBoxMysignalsEnter(void);

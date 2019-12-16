@@ -22,23 +22,13 @@ ui->setupUi(this);
 ShowAllLyric = 0;
 ui->listWidget_2->hide();
 ui->groupBox->hide();
-connect(ui->pushButton_2,&QPushButton::clicked,[=]{
-if(ShowAllLyric == 0)
-{
-    ui->listWidget_2->show();
-    ShowAllLyric = 1;
-}
-else
-{
-    ui->listWidget_2->hide();
-    ShowAllLyric = 0;
-}
-});
-connect(ui->pushButton,SIGNAL(QPushButonMysignalsEnter()),this,SLOT(SlotQPushButtonMysignalsEnter()));
-connect(ui->pushButton,SIGNAL(QPushButonMysignalsLeave()),this,SLOT(SlotQPushButtonMysignalsLeave()));
-connect(ui->groupBox,SIGNAL(QGroupMysignalsLeave()),this,SLOT(SlotQGroupBoxMysignalsEnter()));
-connect(ui->groupBox,SIGNAL(QGroupMysignalsEnter()),this,SLOT(SlotQGroupBoxMysignalsleave()));
 
+connect(ui->pushButton_showalllyric,SIGNAL(clicked()),this,SLOT(SlotQPushButtonShowAllLyric()));
+connect(ui->pushButton_volume,SIGNAL(QPushButonMysignalsEnter()),this,SLOT(SlotQPushButtonMysignalsEnter()));
+connect(ui->pushButton_volume,SIGNAL(QPushButonMysignalsLeave()),this,SLOT(SlotQPushButtonMysignalsLeave()));
+connect(ui->groupBox,SIGNAL(QGroupMysignalsLeave()),this,SLOT(SlotQGroupBoxMysignalsLeave()));
+connect(ui->groupBox,SIGNAL(QGroupMysignalsEnter()),this,SLOT(SlotQGroupBoxMysignalsEnter()));
+connect(ui->pushButton_volume,SIGNAL(clicked()),this,SLOT(SlotQPushButtonvolume()));
 
 
     QTimer *time = new QTimer(this);
@@ -51,10 +41,10 @@ connect(ui->groupBox,SIGNAL(QGroupMysignalsEnter()),this,SLOT(SlotQGroupBoxMysig
     connect(ui->pushButton_last,SIGNAL(clicked()),this,SLOT(SlotMusicFront()));
     connect(ui->pushButton_next,SIGNAL(clicked()),this,SLOT(SlotMusicNext()));
   //  connect(time,SIGNAL(timeout()),this,SLOT(SlotTimeOut()));
-    connect(ui->pushButton,SIGNAL(Mysignalsvulmehide()),this,SLOT(SlotVulmeHide()));
-    connect(ui->pushButton,SIGNAL(Mysignalsvulmeshow()),this,SLOT(SlotVulmeShow()));
+    connect(ui->pushButton_volume,SIGNAL(Mysignalsvulmehide()),this,SLOT(SlotVulmeHide()));
+    connect(ui->pushButton_volume,SIGNAL(Mysignalsvulmeshow()),this,SLOT(SlotVulmeShow()));
     connect(ui->progress_bar,SIGNAL(valueChanged(int)),this,SLOT(SlotProgressValue(int)));
-    connect(ui->progress_bar,SIGNAL(sliderPressed()),this,SLOT());
+
 
 
 
@@ -81,12 +71,19 @@ void MainWindow::MyCutSong()
    fflush(stdout);
    FILE *MyFd;
    HaveLyricFlag = 0;
+   for(int a = 0;a < 3;a++)
+   {
+       Lyric[a]->row = a;
+       strcpy(Lyric[a]->MyLyric,"\n");
+      Lyriclist.push_back(Lyric[a]);
+   }
   if( (MyFd = fopen(Site,"r+")) == NULL){
     perror("fopen the lyric");
 
     return;
   }
   int i = 0;
+
   while(fgets(buff1, sizeof(buff1), MyFd) != NULL)
       {
       if(i > 3)
@@ -95,17 +92,23 @@ void MainWindow::MyCutSong()
      sscanf(buff1,"[%02d:%02d.%02d]",&val1,&val2,&val3);
       strcpy(buff,&(buff1[10]));
       strcpy(&(buff[strlen(buff)-2]),"\n\0\0");
-      printf("%s\n ",buff);
-      fflush(stdout);
-      strcpy(Lyric[i-4]->MyLyric,buff) ;
-      Lyric[i-4]->row = i-4;
-      Lyric[i-4]->time = val1*600+val2*10;
-      printf("*\n ",buff);fflush(stdout);
+//      printf("%s\n ",buff);
+//      fflush(stdout);
+      strcpy(Lyric[i-1]->MyLyric,buff) ;
+      Lyric[i-1]->row = i-1;
+      Lyric[i-1]->time = val1*600+val2*10;
+//      printf("*\n ",buff);fflush(stdout);
        Lyriclist.push_back(Lyric[i-4]);
-       printf("&\n ",buff);fflush(stdout);
+//       printf("&\n ",buff);fflush(stdout);
       }
       i++;
       }
+  for(int b = 0;b < 3;b++)
+  {
+      Lyric[i]->row = i + b;
+      strcpy(Lyric[i]->MyLyric,"\n");
+      Lyriclist.push_back(Lyric[i]);
+}
   HaveLyricFlag = 1;
   fclose(MyFd);
   viewinformation.lyric = buf;
@@ -119,10 +122,17 @@ char* MainWindow::MyFindLyric()
     std::for_each(Lyriclist.begin(),Lyriclist.end(),[=](lyric* val ){
         if((int)(viewinformation.NowTime *10) == val->time)
         {
-            printf("%s\n",val->MyLyric);
+//            printf("%s\n",val->MyLyric);
             fflush(stdout);
             strcpy(MyBuff,val->MyLyric);
+            ui->listWidget_2->setCurrentRow(val->row+2);
             ui->listWidget_2->setCurrentRow(val->row);
+            ui->listWidget_2->item(val->row)->setTextColor(QColor(255,0,0,255));
+            if(val->row != 0)
+            {
+                ui->listWidget_2->item(val->row-1)->setTextColor(QColor(0,0,0,255));
+            }
+
         }
     });
     return MyBuff;
@@ -154,8 +164,8 @@ void MainWindow::SlotMusicFront()
     strcpy(buf,QStringToChar(ui->listWidget->currentItem()->text()));
     sprintf(buff,"loadfile \"../MyQT_Mplayer_Project/song/%s\"\n",buf);
     SendMsgToMplayer(buff);
-    printf("%s\n",buff);
-    fflush(stdout);
+//    printf("%s\n",buff);
+//    fflush(stdout);
     MyCutSong();
     Unlock();
     ui->progress_bar->setMaximum(viewinformation.AllTime);
@@ -175,8 +185,8 @@ void MainWindow::SlotMusicNext()
     strcpy(buf,QStringToChar(ui->listWidget->currentItem()->text()));
     sprintf(buff,"loadfile \"../MyQT_Mplayer_Project/song/%s\"\n",buf);
     SendMsgToMplayer(buff);
-    printf("%s\n",buff);
-    fflush(stdout);
+//    printf("%s\n",buff);
+//    fflush(stdout);
     MyCutSong();
     Unlock();
     ui->progress_bar->setMaximum(viewinformation.AllTime);
@@ -228,6 +238,34 @@ void MainWindow::SlotSliderReleased()
     SpliderPress = 1;
 }
 
+void MainWindow::SlotQPushButtonShowAllLyric()
+{
+    if(ShowAllLyric == 0)
+    {
+        ui->listWidget_2->show();
+        ShowAllLyric = 1;
+    }
+    else
+    {
+        ui->listWidget_2->hide();
+        ShowAllLyric = 0;
+    }
+}
+
+void MainWindow::SlotQPushButtonvolume()
+{
+    if(MuteFlag == 0)
+    {
+        MuteFlag = 1;
+        SendMsgToMplayer("mute 1\n");
+    }
+    else
+    {
+        MuteFlag = 0;
+        SendMsgToMplayer("mute 0\n");
+    }
+}
+
 void MainWindow::SlotQPushButtonMysignalsEnter()
 {
     ui->groupBox->show();
@@ -269,12 +307,12 @@ void MainWindow::SlotMyDoubleClickedList(QListWidgetItem *item)
 {
             char buff[128]= "";
             strcpy(buf,QStringToChar(item->text()));
-            printf("%s\n",buf);
-            fflush(stdout);
+//            printf("%s\n",buf);
+//            fflush(stdout);
             sprintf(buff,"loadfile \"../MyQT_Mplayer_Project/song/%s\"\n",buf);
             SendMsgToMplayer(buff);
-            printf("%s\n",buff);
-           fflush(stdout);
+//            printf("%s\n",buff);
+//           fflush(stdout);
            MyCutSong();
            Unlock();
 
@@ -360,6 +398,7 @@ void MainWindow::Initialize()
     ui->pushButton_last->setShortcut(QKeySequence(Qt::Key_Left));
     ui->pushButton_next->setShortcut(QKeySequence(Qt::Key_Right));
     ui->pushButton_pause->setShortcut(QKeySequence(Qt::Key_Space));
+
     bzero(buf,sizeof(buf));
     ReadDir("../MyQT_Mplayer_Project/song/");
 
@@ -431,11 +470,14 @@ void MainWindow::SetAllLyric()
         while(it != Lyriclist.end())
         {
 
-            printf("weifjowjefiajfijaewifj\n");
-            fflush(stdout);
+//            printf("weifjowjefiajfijaewifj\n");
+//            fflush(stdout);
             QListWidgetItem *val = new QListWidgetItem(QString(it.i->t()->MyLyric));
         ui->listWidget_2->addItem(val);
         val->setTextAlignment(Qt::AlignHCenter);
+//        val->setFlags(Qt::NoItemFlags);
+
+        val->setFlags(val->flags()&~Qt::ItemIsSelectable);
 
 
         it++;
@@ -549,10 +591,6 @@ void *MyPrint(void *arg)
            char buff[128];
            sprintf(buff,"volume %d 1\n",m->viewinformation.hub);
            SendMsgToMplayer(buff);
-        }
-
-        {
-
         }
     }
 }

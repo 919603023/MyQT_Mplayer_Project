@@ -280,7 +280,7 @@
      </property>
     </widget>
    </widget>
-   <widget class="MyQPushButton" name="pushButton">
+   <widget class="MyQPushButton" name="pushButton_volume">
     <property name="geometry">
      <rect>
       <x>670</x>
@@ -293,7 +293,7 @@
      <string>volume</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_2">
+   <widget class="QPushButton" name="pushButton_showalllyric">
     <property name="geometry">
      <rect>
       <x>10</x>
