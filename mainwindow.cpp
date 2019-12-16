@@ -17,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
 //  ui->widget->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
-
+ui->setupUi(this);
     Initialize();
 ShowAllLyric = 0;
 ui->listWidget_2->hide();
@@ -63,7 +63,7 @@ void MainWindow::MyCutSong()
 {
 
 
-   printf("a wo si la\n");fflush(stdout);
+
    char buff[128] = "";
    char Site[128] = "";
    int val1,val2,val3;
@@ -92,6 +92,7 @@ void MainWindow::MyCutSong()
       printf("%s\n ",buff);
       fflush(stdout);
       strcpy(Lyric[i-4]->MyLyric,buff) ;
+      Lyric[i-4]->row = i-4;
       Lyric[i-4]->time = val1*600+val2*10;
       printf("*\n ",buff);fflush(stdout);
        Lyriclist.push_back(Lyric[i-4]);
@@ -115,6 +116,7 @@ char* MainWindow::MyFindLyric()
             printf("%s\n",val->MyLyric);
             fflush(stdout);
             strcpy(MyBuff,val->MyLyric);
+            ui->listWidget_2->setCurrentRow(val->row);
         }
     });
     return MyBuff;
@@ -300,6 +302,7 @@ void MainWindow::ReadDir(char *val)
 }
 void MainWindow::Initialize()
 {
+
     for(int i = 0;i < 128;i++)
     {
         lyric *val = (lyric*)malloc(sizeof (int)+256);
@@ -312,7 +315,7 @@ void MainWindow::Initialize()
     OpenFlag = 0;
     CutSong = 0;
     pthread_mutex_init(&mutex,NULL);
-    ui->setupUi(this);
+
     HaveLyricFlag = 0;
     this->setFixedSize(800, 450);
     ui->spinBox_huds->setValue(99);
@@ -347,8 +350,7 @@ void MainWindow::PrintInformation()
    ui->label_totaltime->setText(QString(viewinformation.alltime));
 
        ui->progress_bar->setValue(viewinformation.NowTime);
-       printf("%d \n",viewinformation.NowTime);
-       fflush(stdout);
+//      ui->listWidget_2->setCurrentRow(19);
 
 
 }
@@ -409,8 +411,10 @@ void MainWindow::SetAllLyric()
         ui->listWidget_2->addItem(val);
         val->setTextAlignment(Qt::AlignHCenter);
 
+
         it++;
         }
+
     }
 }
 void SendMsgToMplayer(char *val)

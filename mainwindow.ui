@@ -280,7 +280,7 @@
      </property>
     </widget>
    </widget>
-   <widget class="MyQPushbutton" name="pushButton">
+   <widget class="QPushButton" name="pushButton">
     <property name="geometry">
      <rect>
       <x>670</x>
@@ -328,13 +328,6 @@
    </property>
   </widget>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>MyQPushbutton</class>
-   <extends>QPushButton</extends>
-   <header>myqpushbutton.h</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

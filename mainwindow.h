@@ -28,10 +28,11 @@
 #include <iostream>
 #include <QTextCodec>
 #include <QListWidgetItem>
-#include "myqpushbutton.h"
+
 typedef   struct
 {
     int time;
+    int row;
     char MyLyric[256];
 }lyric;
 struct ViewInformation
