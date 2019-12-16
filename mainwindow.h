@@ -28,6 +28,7 @@
 #include <iostream>
 #include <QTextCodec>
 #include <QListWidgetItem>
+#include "myqpushbutton.h"
 typedef   struct
 {
     int time;
@@ -50,6 +51,7 @@ struct ViewInformation
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
+extern void *MyPrint(void *arg);
 extern void *MyGetTimeAndBar(void *arg);
 extern void *MySendMsgToMplayer(void *arg);
 extern void SetSeekBarFindViewById(int val);
@@ -92,11 +94,13 @@ public:
 signals:
 
 public slots:
-   void MyClickedPlaying(void);
-   void MyDoubleClickedList(QListWidgetItem *item);
-   void MusicNext(void);
-   void MusicFront(void);
-   void TimeOut(void);
+   void SlotMyClickedPlaying(void);
+   void SlotMyDoubleClickedList(QListWidgetItem *item);
+   void SlotMusicNext(void);
+   void SlotMusicFront(void);
+   void SlotTimeOut(void);
+   void SlotVulmeHide(void);
+   void SlotVulmeShow(void);
 private:
     Ui::MainWindow *ui;
 

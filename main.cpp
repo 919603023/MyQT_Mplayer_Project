@@ -3,7 +3,12 @@
 #include <QApplication>
 
 
+struct adsf
+{
+    int b;
+    MainWindow * c;
 
+};
 int main(int argc, char *argv[])
 {
     pthread_mutex_init(&mutex,NULL);
@@ -46,9 +51,13 @@ int main(int argc, char *argv[])
     pthread_t send_mplayer;
     pthread_create(&send_mplayer,NULL,MySendMsgToMplayer,NULL);
     pthread_detach(send_mplayer);
+    pthread_t myprint;
+    pthread_create(&myprint,NULL,MyPrint,(void *)&w);
+    pthread_detach(myprint);
 
     QTextCodec *codec = QTextCodec::codecForName("utf8");
-
+    adsf d;
+    d.c = &w;
 
 
       QTextCodec::setCodecForLocale(codec);

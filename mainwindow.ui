@@ -144,33 +144,10 @@
      <string/>
     </property>
    </widget>
-   <widget class="QSlider" name="huds">
-    <property name="geometry">
-     <rect>
-      <x>680</x>
-      <y>220</y>
-      <width>16</width>
-      <height>101</height>
-     </rect>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Vertical</enum>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="spinBox_huds">
-    <property name="geometry">
-     <rect>
-      <x>670</x>
-      <y>190</y>
-      <width>42</width>
-      <height>26</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QListWidget" name="listWidget">
     <property name="geometry">
      <rect>
-      <x>480</x>
+      <x>470</x>
       <y>20</y>
       <width>181</width>
       <height>261</height>
@@ -182,7 +159,7 @@
      </property>
     </item>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>60</x>
@@ -267,6 +244,55 @@
      </item>
     </layout>
    </widget>
+   <widget class="QGroupBox" name="groupBox">
+    <property name="geometry">
+     <rect>
+      <x>670</x>
+      <y>140</y>
+      <width>51</width>
+      <height>161</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string/>
+    </property>
+    <widget class="QSpinBox" name="spinBox_huds">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>42</width>
+       <height>26</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QSlider" name="huds">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>50</y>
+       <width>16</width>
+       <height>101</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+    </widget>
+   </widget>
+   <widget class="MyQPushbutton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>670</x>
+      <y>300</y>
+      <width>51</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>volume</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -279,6 +305,13 @@
    </property>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MyQPushbutton</class>
+   <extends>QPushButton</extends>
+   <header>myqpushbutton.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

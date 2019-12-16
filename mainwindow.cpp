@@ -24,11 +24,14 @@ MainWindow::MainWindow(QWidget *parent)
     time->start(100);
     connect(ui->huds, &QSlider::valueChanged, ui->spinBox_huds, &QSpinBox::setValue);
        //当改变选值框的值时，同时进度条也改变位置
-    connect(ui->pushButton_pause,SIGNAL(clicked()),this,SLOT(MyClickedPlaying()));
-    connect(ui->listWidget,SIGNAL(itemDoubleClicked(QListWidgetItem*)),this,SLOT(MyDoubleClickedList(QListWidgetItem *)));
-    connect(ui->pushButton_last,SIGNAL(clicked()),this,SLOT(MusicFront()));
-    connect(ui->pushButton_next,SIGNAL(clicked()),this,SLOT(MusicNext()));
-    connect(time,SIGNAL(timeout()),this,SLOT(TimeOut()));
+    connect(ui->pushButton_pause,SIGNAL(clicked()),this,SLOT(SlotMyClickedPlaying()));
+    connect(ui->listWidget,SIGNAL(itemDoubleClicked(QListWidgetItem*)),this,SLOT(SlotMyDoubleClickedList(QListWidgetItem *)));
+    connect(ui->pushButton_last,SIGNAL(clicked()),this,SLOT(SlotMusicFront()));
+    connect(ui->pushButton_next,SIGNAL(clicked()),this,SLOT(SlotMusicNext()));
+  //  connect(time,SIGNAL(timeout()),this,SLOT(SlotTimeOut()));
+    connect(ui->pushButton,SIGNAL(Mysignalsvulmehide()),this,SLOT(SlotVulmeHide()));
+    connect(ui->pushButton,SIGNAL(Mysignalsvulmeshow()),this,SLOT(SlotVulmeShow()));
+
 
 }
 MainWindow::~MainWindow()
@@ -101,7 +104,9 @@ void MainWindow::closeEvent(QCloseEvent *event)
     sprintf(buff,"kill -9 %d",pid);
     system(buff);
 }
-void MainWindow::MusicFront()
+
+
+void MainWindow::SlotMusicFront()
 {
     if(ui->listWidget->currentRow() == 0)//当光标在第一个文件时，点击上一个光标移动到最下面的文件，不播放
     {
@@ -121,7 +126,7 @@ void MainWindow::MusicFront()
     Unlock();
 
 }
-void MainWindow::MusicNext()
+void MainWindow::SlotMusicNext()
 {
     if(ui->listWidget->currentRow() == ui->listWidget->count()-1)
     {
@@ -141,7 +146,7 @@ void MainWindow::MusicNext()
     Unlock();
 
 }
-void MainWindow::TimeOut()
+void MainWindow::SlotTimeOut()
 {
     SetInformation();
     PrintInformation();
@@ -152,8 +157,18 @@ void MainWindow::TimeOut()
        SendMsgToMplayer(buff);
     }
 }
+
+void MainWindow::SlotVulmeHide()
+{
+    ui->groupBox->hide();
+}
+
+void MainWindow::SlotVulmeShow()
+{
+    ui->groupBox->show();
+}
 // clicke the pause button
-void MainWindow::MyClickedPlaying()
+void MainWindow::SlotMyClickedPlaying()
 {
 
     if(PuaesFlag == 0)
@@ -168,7 +183,7 @@ void MainWindow::MyClickedPlaying()
 
 }
 
-void MainWindow::MyDoubleClickedList(QListWidgetItem *item)
+void MainWindow::SlotMyDoubleClickedList(QListWidgetItem *item)
 {
             char buff[128]= "";
             strcpy(buf,QStringToChar(item->text()));
@@ -406,6 +421,22 @@ void *MyGetTimeAndBar(void *arg)
             }
               fflush(stdout);
         }
+}
+void *MyPrint(void *arg)
+{
+    MainWindow *m = (MainWindow *)arg;
+    while(1)
+    {
+        usleep(500);
+        m->SetInformation();
+        m->PrintInformation();
+        if(PuaesFlag == 0)
+        {
+           char buff[128];
+           sprintf(buff,"volume %d 1\n",m->viewinformation.hub);
+           SendMsgToMplayer(buff);
+        }
+    }
 }
 
 
