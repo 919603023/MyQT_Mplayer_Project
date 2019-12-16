@@ -45,12 +45,15 @@ int main(int argc, char *argv[])
         w.show();
         w.pid = pid;
      int fd = open("fifo_cmd",O_WRONLY);
+
     pthread_t mplayer_ack;
     pthread_create(&mplayer_ack,NULL,MyGetTimeAndBar,(void *)&w);
     pthread_detach(mplayer_ack);
+
     pthread_t send_mplayer;
     pthread_create(&send_mplayer,NULL,MySendMsgToMplayer,NULL);
     pthread_detach(send_mplayer);
+
     pthread_t myprint;
     pthread_create(&myprint,NULL,MyPrint,(void *)&w);
     pthread_detach(myprint);

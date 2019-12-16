@@ -22,6 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     QTimer *time = new QTimer(this);
     time->start(100);
+
     connect(ui->huds, &QSlider::valueChanged, ui->spinBox_huds, &QSpinBox::setValue);
        //当改变选值框的值时，同时进度条也改变位置
     connect(ui->pushButton_pause,SIGNAL(clicked()),this,SLOT(SlotMyClickedPlaying()));
@@ -31,6 +32,9 @@ MainWindow::MainWindow(QWidget *parent)
   //  connect(time,SIGNAL(timeout()),this,SLOT(SlotTimeOut()));
     connect(ui->pushButton,SIGNAL(Mysignalsvulmehide()),this,SLOT(SlotVulmeHide()));
     connect(ui->pushButton,SIGNAL(Mysignalsvulmeshow()),this,SLOT(SlotVulmeShow()));
+    connect(ui->progress_bar,SIGNAL(valueChanged(int)),this,SLOT(SlotProgressValue(int)));
+    connect(ui->progress_bar,SIGNAL(sliderPressed()),this,SLOT());
+
 
 
 }
@@ -83,6 +87,7 @@ void MainWindow::MyCutSong()
   HaveLyricFlag = 1;
   fclose(MyFd);
   viewinformation.lyric = buf;
+
 }
 
 char* MainWindow::MyFindLyric()
@@ -124,6 +129,7 @@ void MainWindow::SlotMusicFront()
     fflush(stdout);
     MyCutSong();
     Unlock();
+    ui->progress_bar->setMaximum(viewinformation.AllTime);
 
 }
 void MainWindow::SlotMusicNext()
@@ -144,6 +150,7 @@ void MainWindow::SlotMusicNext()
     fflush(stdout);
     MyCutSong();
     Unlock();
+    ui->progress_bar->setMaximum(viewinformation.AllTime);
 
 }
 void MainWindow::SlotTimeOut()
@@ -167,6 +174,32 @@ void MainWindow::SlotVulmeShow()
 {
     ui->groupBox->show();
 }
+
+void MainWindow::SlotProgressValue(int val)
+{
+    int i ;
+    char buff[128] = {0};
+    i = val - viewinformation.NowTime;
+    sprintf(buff,"seek %d\n",i);
+
+    SendMsgToMplayer(buff);
+    viewinformation.NowTime = val;
+
+   SetTimeQstring(val,viewinformation.nowtime);
+
+}
+
+void MainWindow::SlotSliderPressed()
+{
+    SpliderPress = 0;
+}
+
+void MainWindow::SlotSliderReleased()
+{
+    SpliderPress = 1;
+}
+
+
 // clicke the pause button
 void MainWindow::SlotMyClickedPlaying()
 {
@@ -282,6 +315,7 @@ void MainWindow::Initialize()
 }
 void MainWindow::PrintInformation()
 {
+  ui->progress_bar->setMaximum(viewinformation.AllTime);
    ui->huds->setValue(viewinformation.hub);
    ui->label_songname->setText(viewinformation.song);
    ui->label_singername->setText(viewinformation.singer);
@@ -289,7 +323,12 @@ void MainWindow::PrintInformation()
    ui->label_lyric->setText(viewinformation.lyric);
    ui->label_nowtime->setText(viewinformation.nowtime);
    ui->label_totaltime->setText(QString(viewinformation.alltime));
-   ui->progress_bar->setValue(viewinformation.progress);
+
+       ui->progress_bar->setValue(viewinformation.NowTime);
+       printf("%d \n",viewinformation.NowTime);
+       fflush(stdout);
+
+
 }
 void MainWindow::SetInformation()
 {
@@ -425,9 +464,10 @@ void *MyGetTimeAndBar(void *arg)
 void *MyPrint(void *arg)
 {
     MainWindow *m = (MainWindow *)arg;
+    usleep(200*1000);
     while(1)
     {
-        usleep(500);
+        usleep(500*100);
         m->SetInformation();
         m->PrintInformation();
         if(PuaesFlag == 0)
@@ -435,6 +475,10 @@ void *MyPrint(void *arg)
            char buff[128];
            sprintf(buff,"volume %d 1\n",m->viewinformation.hub);
            SendMsgToMplayer(buff);
+        }
+
+        {
+
         }
     }
 }

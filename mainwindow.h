@@ -77,6 +77,7 @@ public:
     pid_t pid;
     char MyBuff[128];
     int HaveLyricFlag;
+    int SpliderPress;
     lyric *Lyric[128];
     QString setnowtimeqstring ="";
     ViewInformation viewinformation;
@@ -101,6 +102,9 @@ public slots:
    void SlotTimeOut(void);
    void SlotVulmeHide(void);
    void SlotVulmeShow(void);
+   void SlotProgressValue(int val);
+   void SlotSliderPressed(void);
+   void SlotSliderReleased(void);
 private:
     Ui::MainWindow *ui;
 
