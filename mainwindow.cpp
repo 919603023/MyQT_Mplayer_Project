@@ -21,6 +21,7 @@ ui->setupUi(this);
     Initialize();
 ShowAllLyric = 0;
 ui->listWidget_2->hide();
+ui->groupBox->hide();
 connect(ui->pushButton_2,&QPushButton::clicked,[=]{
 if(ShowAllLyric == 0)
 {
@@ -33,6 +34,11 @@ else
     ShowAllLyric = 0;
 }
 });
+connect(ui->pushButton,SIGNAL(QPushButonMysignalsEnter()),this,SLOT(SlotQPushButtonMysignalsEnter()));
+connect(ui->pushButton,SIGNAL(QPushButonMysignalsLeave()),this,SLOT(SlotQPushButtonMysignalsLeave()));
+connect(ui->groupBox,SIGNAL(QGroupMysignalsLeave()),this,SLOT(SlotQGroupBoxMysignalsEnter()));
+connect(ui->groupBox,SIGNAL(QGroupMysignalsEnter()),this,SLOT(SlotQGroupBoxMysignalsleave()));
+
 
 
     QTimer *time = new QTimer(this);
@@ -220,6 +226,26 @@ void MainWindow::SlotSliderPressed()
 void MainWindow::SlotSliderReleased()
 {
     SpliderPress = 1;
+}
+
+void MainWindow::SlotQPushButtonMysignalsEnter()
+{
+    ui->groupBox->show();
+}
+
+void MainWindow::SlotQPushButtonMysignalsLeave()
+{
+    ui->groupBox->hide();
+}
+
+void MainWindow::SlotQGroupBoxMysignalsEnter()
+{
+    ui->groupBox->show();
+}
+
+void MainWindow::SlotQGroupBoxMysignalsLeave()
+{
+    ui->groupBox->hide();
 }
 
 

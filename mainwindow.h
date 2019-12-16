@@ -28,7 +28,8 @@
 #include <iostream>
 #include <QTextCodec>
 #include <QListWidgetItem>
-
+#include "myqpushbutton.h"
+#include "myqgroup.h"
 typedef   struct
 {
     int time;
@@ -108,6 +109,10 @@ public slots:
    void SlotProgressValue(int val);
    void SlotSliderPressed(void);
    void SlotSliderReleased(void);
+   void SlotQPushButtonMysignalsEnter(void);
+   void SlotQPushButtonMysignalsLeave(void);
+   void SlotQGroupBoxMysignalsEnter(void);
+   void SlotQGroupBoxMysignalsLeave(void);
 private:
     Ui::MainWindow *ui;
 

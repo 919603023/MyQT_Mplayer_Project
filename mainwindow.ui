@@ -244,7 +244,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QGroupBox" name="groupBox">
+   <widget class="MyQGroup" name="groupBox">
     <property name="geometry">
      <rect>
       <x>670</x>
@@ -280,7 +280,7 @@
      </property>
     </widget>
    </widget>
-   <widget class="QPushButton" name="pushButton">
+   <widget class="MyQPushButton" name="pushButton">
     <property name="geometry">
      <rect>
       <x>670</x>
@@ -328,6 +328,19 @@
    </property>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MyQPushButton</class>
+   <extends>QPushButton</extends>
+   <header>myqpushbutton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>MyQGroup</class>
+   <extends>QGroupBox</extends>
+   <header>myqgroup.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
