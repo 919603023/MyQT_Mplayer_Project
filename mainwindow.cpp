@@ -317,6 +317,7 @@ void MainWindow::Initialize()
     this->setFixedSize(800, 450);
     ui->spinBox_huds->setValue(99);
     ui->huds->setValue(99);
+//    ui->listWidget_2
     ui->label_lyric->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
     ui->label_song->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
     ui->label_album->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
@@ -393,6 +394,7 @@ void MainWindow::Unlock()
 
 void MainWindow::SetAllLyric()
 {
+    ui->listWidget_2->clear();
     if(Lyriclist.count() != 0)
     {
  //       std::for_each(Lyriclist.begin(),Lyriclist.end(),MainWindow::InsterListWidget);
@@ -403,7 +405,10 @@ void MainWindow::SetAllLyric()
 
             printf("weifjowjefiajfijaewifj\n");
             fflush(stdout);
-        ui->listWidget_2->addItem(new QListWidgetItem(QString(it.i->t()->MyLyric)));
+            QListWidgetItem *val = new QListWidgetItem(QString(it.i->t()->MyLyric));
+        ui->listWidget_2->addItem(val);
+        val->setTextAlignment(Qt::AlignHCenter);
+
         it++;
         }
     }
