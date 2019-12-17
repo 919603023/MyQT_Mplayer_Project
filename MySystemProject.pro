@@ -19,12 +19,14 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     myqgroup.cpp \
-    myqpushbutton.cpp
+    myqpushbutton.cpp \
+    myslider.cpp
 
 HEADERS += \
     mainwindow.h \
     myqgroup.h \
-    myqpushbutton.h
+    myqpushbutton.h \
+    myslider.h
 
 FORMS += \
     mainwindow.ui
