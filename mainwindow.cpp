@@ -17,7 +17,10 @@ int PuaesFlag= 0;
 
 
 pthread_mutex_t mutex;
-QList<lyric*> Lyriclist;
+
+QList<int> LyriclistTime;
+QList<int> lyriclistRow;
+QList<QString> LyriclistLyric;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -60,7 +63,7 @@ void MainWindow::Initialize()
 
     for(int i = 0;i < 128;i++)
     {
-        lyric *val = (lyric*)malloc(sizeof (int)+256);
+        lyric *val = new lyric;
         Lyric[i] = val;
     }
     fd = open("fifo_cmd",O_RDWR);
@@ -158,6 +161,18 @@ void MainWindow::MyCutSong()
 //       lyric *val = (lyric*)malloc(sizeof (int)+256);
 //       Lyric[i] = val;
 //   }
+//   QList<QString>::iterator it = LyriclistLyric.begin();
+
+//   while(it != LyriclistLyric.end())
+//   {
+
+//    qDebug() << it.i->t();
+//    delete it.i;
+//   it++;
+//   }
+   LyriclistTime.clear();
+   lyriclistRow.clear();
+   LyriclistLyric.clear();
 
 
    char buff[128] = "";
@@ -174,9 +189,10 @@ void MainWindow::MyCutSong()
    for(int a = 0;a < 3;a++)
    {
 
-      Lyric[a]->row= a;
-       strcpy(Lyric[a]->MyLyric,"\n");
-      Lyriclist.push_back(Lyric[a]);
+
+      LyriclistTime.push_back(0);
+      lyriclistRow.push_back(a);
+      LyriclistLyric.push_back("\n");
    }
   if( (MyFd = fopen(Site,"r+")) != NULL){
 
@@ -196,12 +212,15 @@ void MainWindow::MyCutSong()
 //      sprintf(buff," %s",buff);
       strcpy(&(buff[strlen(buff)-1])," \n\0");
 
-      strcpy(Lyric[i]->MyLyric,buff) ;
-      Lyric[i]->row = i-1;
-     Lyric[i]->time = val1*600+val2*10;
+//      strcpy(Lyric[i]->MyLyric,buff) ;
+//      Lyric[i]->row = i-1;
+//     Lyric[i]->time = val1*600+val2*10;
+     LyriclistTime.push_back(val1*600+val2*10);
+     lyriclistRow.push_back(i-1);
+     LyriclistLyric.push_back(buff);
 
       usleep(5000);
-       Lyriclist.push_back(Lyric[i]);
+//       Lyriclist.push_back(Lyric[i]);
 
 
       }
@@ -211,10 +230,13 @@ void MainWindow::MyCutSong()
   {
 
 
-      Lyric[i+b]->row = i + b;
-      strcpy(Lyric[i+6]->MyLyric,"\n");
+//      Lyric[i+b]->row = i + b;
+//      strcpy(Lyric[i+6]->MyLyric,"\n");
 
-      Lyriclist.push_back(Lyric[i+b]);
+      LyriclistTime.push_back(0);
+      lyriclistRow.push_back(i+b);
+      LyriclistLyric.push_back("\n");
+//      Lyriclist.push_back(Lyric[i+b]);
 
 }
 
@@ -236,24 +258,31 @@ char* MainWindow::MyFindLyric()
     bzero(MyBuff,sizeof (MyBuff));
 
 
-    if(Lyriclist.count()<10)
+    if(LyriclistLyric.count()<10)
     {
         return "NO_HAVE_LYRIC";
     }
     usleep(5000);
 
+if(int a =LyriclistTime.indexOf(viewinformation.NowTime) != -1)
+{
+    ui->listWidget_2->setCurrentRow(a+5);
+    ui->listWidget_2->setCurrentRow(a+3);
+    for(int i = 0;i < ui->listWidget_2->count();i++)
+   {
 
-    std::for_each(Lyriclist.begin(),Lyriclist.end(),[=](lyric* val ){
-        if(viewinformation.NowTime *10 == val->time)        {
+       ui->listWidget_2->item(i)->setTextColor(QColor(0,0,0,255));
+    }
+
+      ui->listWidget_2->item(a+3)->setTextColor(QColor(255,0,0,255));
+}
+
+#if 0
+
+    std::for_each(LyriclistTime.begin(),LyriclistTime.end(),[=](int val ){
+        if(viewinformation.NowTime *10 == val)        {
 
             strcpy(MyBuff,val->MyLyric);
-#if N
-
-    std::for_each(Lyriclist.begin(),Lyriclist.end(),[=](lyric* val ){
-        if(viewinformation.NowTime *10 == val->time)        {
-
-            strcpy(MyBuff,val->MyLyric);
-
 
             ui->listWidget_2->setCurrentRow(val->row+5);
 
@@ -267,9 +296,8 @@ char* MainWindow::MyFindLyric()
             ui->listWidget_2->item(val->row+3)->setTextColor(QColor(255,0,0,255));
             printf("bengle \n");
 
-#endif            fflush(stdout);
-        }
-    });
+#endif
+
 
 
     return MyBuff;
@@ -280,16 +308,18 @@ void MainWindow::SetAllLyric()
     ui->listWidget_2->clear();
 
 
-#if N
+#if 1
 
-        QList<lyric*>::iterator it = Lyriclist.begin();
+        QList<QString>::iterator it = LyriclistLyric.begin();
 
-        while(it != Lyriclist.end())
+        while(it != LyriclistLyric.end())
         {
-        QListWidgetItem *val = new QListWidgetItem(QString(it.i->t()->MyLyric));
+
+        QListWidgetItem *val = new QListWidgetItem(it.i->t());
         ui->listWidget_2->addItem(val);
         val->setTextAlignment(Qt::AlignHCenter);
         val->setFlags(val->flags()&~Qt::ItemIsSelectable);
+         qDebug() << it.i->t();
         it++;
         }
 #endif
