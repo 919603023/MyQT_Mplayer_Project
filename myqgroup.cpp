@@ -1,6 +1,6 @@
 #include "myqgroup.h"
 
-MyQGroup::MyQGroup(QWidget *parent) : QWidget(parent)
+MyQGroup::MyQGroup(QWidget *parent) : QGroupBox(parent)
 {
 
 }
@@ -15,3 +15,5 @@ void MyQGroup::leaveEvent(QEvent *e)
 {
     emit this->QGroupMysignalsLeave();
 }
+
+

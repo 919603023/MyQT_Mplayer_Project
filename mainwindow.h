@@ -45,6 +45,7 @@ struct ViewInformation
     QString alltime;
     QString lyric;
     int progress;
+    int mutehub;
     int hub;
     int NowTime;
     int AllTime;
@@ -116,6 +117,7 @@ public slots:
    void SlotQPushButtonMysignalsLeave(void);
    void SlotQGroupBoxMysignalsEnter(void);
    void SlotQGroupBoxMysignalsLeave(void);
+
 private:
     Ui::MainWindow *ui;
 

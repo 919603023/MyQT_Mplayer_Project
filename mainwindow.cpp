@@ -19,20 +19,19 @@ MainWindow::MainWindow(QWidget *parent)
 //  ui->widget->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
 ui->setupUi(this);
     Initialize();
-ShowAllLyric = 0;
-ui->listWidget_2->hide();
-ui->groupBox->hide();
 
-connect(ui->pushButton_showalllyric,SIGNAL(clicked()),this,SLOT(SlotQPushButtonShowAllLyric()));
-connect(ui->pushButton_volume,SIGNAL(QPushButonMysignalsEnter()),this,SLOT(SlotQPushButtonMysignalsEnter()));
-connect(ui->pushButton_volume,SIGNAL(QPushButonMysignalsLeave()),this,SLOT(SlotQPushButtonMysignalsLeave()));
-connect(ui->groupBox,SIGNAL(QGroupMysignalsLeave()),this,SLOT(SlotQGroupBoxMysignalsLeave()));
-connect(ui->groupBox,SIGNAL(QGroupMysignalsEnter()),this,SLOT(SlotQGroupBoxMysignalsEnter()));
-connect(ui->pushButton_volume,SIGNAL(clicked()),this,SLOT(SlotQPushButtonvolume()));
+QTimer *time = new QTimer(this);
+time->start(100);
+
+    connect(ui->pushButton_showalllyric,SIGNAL(clicked()),this,SLOT(SlotQPushButtonShowAllLyric()));
+    connect(ui->pushButton_volume,SIGNAL(QPushButonMysignalsEnter()),this,SLOT(SlotQPushButtonMysignalsEnter()));
+    connect(ui->pushButton_volume,SIGNAL(QPushButonMysignalsLeave()),this,SLOT(SlotQPushButtonMysignalsLeave()));
+    connect(ui->groupBox,SIGNAL(QGroupMysignalsLeave()),this,SLOT(SlotQGroupBoxMysignalsLeave()));
+    connect(ui->groupBox,SIGNAL(QGroupMysignalsEnter()),this,SLOT(SlotQGroupBoxMysignalsEnter()));
+    connect(ui->pushButton_volume,SIGNAL(clicked()),this,SLOT(SlotQPushButtonvolume()));
 
 
-    QTimer *time = new QTimer(this);
-    time->start(100);
+
 
     connect(ui->huds, &QSlider::valueChanged, ui->spinBox_huds, &QSpinBox::setValue);
        //当改变选值框的值时，同时进度条也改变位置
@@ -41,9 +40,10 @@ connect(ui->pushButton_volume,SIGNAL(clicked()),this,SLOT(SlotQPushButtonvolume(
     connect(ui->pushButton_last,SIGNAL(clicked()),this,SLOT(SlotMusicFront()));
     connect(ui->pushButton_next,SIGNAL(clicked()),this,SLOT(SlotMusicNext()));
   //  connect(time,SIGNAL(timeout()),this,SLOT(SlotTimeOut()));
-    connect(ui->pushButton_volume,SIGNAL(Mysignalsvulmehide()),this,SLOT(SlotVulmeHide()));
-    connect(ui->pushButton_volume,SIGNAL(Mysignalsvulmeshow()),this,SLOT(SlotVulmeShow()));
+//    connect(ui->pushButton_volume,SIGNAL(Mysignalsvulmehide()),this,SLOT(SlotVulmeHide()));
+//    connect(ui->pushButton_volume,SIGNAL(Mysignalsvulmeshow()),this,SLOT(SlotVulmeShow()));
     connect(ui->progress_bar,SIGNAL(valueChanged(int)),this,SLOT(SlotProgressValue(int)));
+
 
 
 
@@ -59,7 +59,7 @@ void MainWindow::MyCutSong()
 {
 
 
-
+Lyriclist.clear();
    char buff[128] = "";
    char Site[128] = "";
    int val1,val2,val3;
@@ -103,7 +103,7 @@ void MainWindow::MyCutSong()
       }
       i++;
       }
-  for(int b = 0;b < 3;b++)
+  for(int b = 0;b < 6;b++)
   {
       Lyric[i]->row = i + b;
       strcpy(Lyric[i]->MyLyric,"\n");
@@ -125,12 +125,12 @@ char* MainWindow::MyFindLyric()
 //            printf("%s\n",val->MyLyric);
             fflush(stdout);
             strcpy(MyBuff,val->MyLyric);
-            ui->listWidget_2->setCurrentRow(val->row+2);
-            ui->listWidget_2->setCurrentRow(val->row);
-            ui->listWidget_2->item(val->row)->setTextColor(QColor(255,0,0,255));
+            ui->listWidget_2->setCurrentRow(val->row+5);
+            ui->listWidget_2->setCurrentRow(val->row+3);
+            ui->listWidget_2->item(val->row+3)->setTextColor(QColor(255,0,0,255));
             if(val->row != 0)
             {
-                ui->listWidget_2->item(val->row-1)->setTextColor(QColor(0,0,0,255));
+                ui->listWidget_2->item(val->row+2)->setTextColor(QColor(0,0,0,255));
             }
 
         }
@@ -254,15 +254,20 @@ void MainWindow::SlotQPushButtonShowAllLyric()
 
 void MainWindow::SlotQPushButtonvolume()
 {
+
+
     if(MuteFlag == 0)
     {
+
         MuteFlag = 1;
-        SendMsgToMplayer("mute 1\n");
+        viewinformation.mutehub = ui->huds->value();
+        ui->huds->setValue(0);
+
     }
     else
     {
         MuteFlag = 0;
-        SendMsgToMplayer("mute 0\n");
+        ui->huds->setValue(viewinformation.mutehub);
     }
 }
 
@@ -285,6 +290,7 @@ void MainWindow::SlotQGroupBoxMysignalsLeave()
 {
     ui->groupBox->hide();
 }
+
 
 
 // clicke the pause button
@@ -366,6 +372,7 @@ void MainWindow::ReadDir(char *val)
 }
 void MainWindow::Initialize()
 {
+     MuteFlag = 0;
 
     for(int i = 0;i < 128;i++)
     {
@@ -398,6 +405,9 @@ void MainWindow::Initialize()
     ui->pushButton_last->setShortcut(QKeySequence(Qt::Key_Left));
     ui->pushButton_next->setShortcut(QKeySequence(Qt::Key_Right));
     ui->pushButton_pause->setShortcut(QKeySequence(Qt::Key_Space));
+    ShowAllLyric = 0;
+    ui->listWidget_2->hide();
+    ui->groupBox->hide();
 
     bzero(buf,sizeof(buf));
     ReadDir("../MyQT_Mplayer_Project/song/");
@@ -405,7 +415,10 @@ void MainWindow::Initialize()
 }
 void MainWindow::PrintInformation()
 {
+
   ui->progress_bar->setMaximum(viewinformation.AllTime);
+printf("%d\n",viewinformation.NowTime);
+fflush(stdout);
    ui->huds->setValue(viewinformation.hub);
    ui->label_songname->setText(viewinformation.song);
    ui->label_singername->setText(viewinformation.singer);
@@ -414,7 +427,8 @@ void MainWindow::PrintInformation()
    ui->label_nowtime->setText(viewinformation.nowtime);
    ui->label_totaltime->setText(QString(viewinformation.alltime));
 
-       ui->progress_bar->setValue(viewinformation.NowTime);
+      ui->progress_bar->setValue(viewinformation.NowTime);
+//             ui->progress_bar->setValue(0);
 //      ui->listWidget_2->setCurrentRow(19);
 
 
@@ -521,7 +535,7 @@ void *MyGetTimeAndBar(void *arg)
 {
     char val[128] = "";
     char buf[128] = "";
-    float val1;
+   int val1;
     char cmd[128] = "";
      MainWindow *m = (MainWindow *)arg;
        int fd  = open("Myfifo",O_RDONLY);
@@ -566,10 +580,11 @@ void *MyGetTimeAndBar(void *arg)
             else if(strcmp(cmd,"ANS_LENGTH") == 0)
             {
 
-                sscanf(buf,"%*[^=]=%f",&val1);
+                sscanf(buf,"%*[^=]=%d",&val1);
 
                  m->SetTimeQstring(val1,m->viewinformation.alltime);
                  m->viewinformation.AllTime = val1;
+
             }
             else
             {
