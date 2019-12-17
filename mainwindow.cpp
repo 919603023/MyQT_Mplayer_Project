@@ -31,7 +31,7 @@ ui->setupUi(this);
 
 QTimer *time = new QTimer(this);
 time->start(500);
-
+ pixmap.load(":/res/img/bg.jpg");
     connect(ui->pushButton_showalllyric,SIGNAL(clicked()),this,SLOT(SlotQPushButtonShowAllLyric()));
     connect(ui->pushButton_volume,SIGNAL(QPushButonMysignalsEnter()),this,SLOT(SlotQGroupBoxMysignalsEnter()));
     connect(ui->pushButton_volume,SIGNAL(QPushButonMysignalsLeave()),this,SLOT(SlotQGroupBoxMysignalsLeave()));
@@ -49,8 +49,31 @@ time->start(500);
 //    connect(ui->pushButton_volume,SIGNAL(Mysignalsvulmeshow()),this,SLOT(SlotVulmeShow()));
     connect(ui->progress_bar,SIGNAL(valueChanged(int)),this,SLOT(SlotProgressValue(int)));
 
+    connect(ui->pushButton_2,&QPushButton::clicked,[=](){
+        if(ui->lineEdit->text() != "")
+        {
+                pixmap.load(ui->lineEdit->text());
+                this->setFixedSize(800,451);
+                this->setFixedSize(800,450);
+        }
+    });
+    /*
+    connect(ui->pushButton,&MyQPushButton::QPushButonMysignalsEnter,[=]{
+       ui->groupBox_2->show();
+    });
+    connect(ui->pushButton,&MyQPushButton::QPushButonMysignalsLeave,[=]{
+       ui->groupBox_2->hide();
+    });
+    connect(ui->groupBox_2,&MyQGroup::QGroupMysignalsEnter,[=]{
+        ui->groupBox_2->show();
+    });
+    connect(ui->groupBox_2,&MyQGroup::QGroupMysignalsLeave,[=]{
+        ui->groupBox_2->hide();
+    });
+    ui->groupBox_2->hide();
+*/
 
-
+//this->setWindowFlags(Qt::FramelessWindowHint);
 }
 MainWindow::~MainWindow()
 {
@@ -323,7 +346,8 @@ void MainWindow::SetAllLyric()
         it++;
         }
 #endif
-    }
+}
+
 
 void MainWindow::SetInformation()
 {
@@ -696,7 +720,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 void MainWindow::resizeEvent(QResizeEvent *)
 {
     QPalette    palette = this->palette();
-    QPixmap    pixmap(":/res/img/bg.jpg");
+
        palette.setBrush(this->backgroundRole(),
                          QBrush(pixmap.scaled(this->size(),
                                 Qt::IgnoreAspectRatio,

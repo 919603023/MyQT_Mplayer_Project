@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <stdio.h>
+#include <QPixmap>
 #include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -89,6 +90,7 @@ public:
     QString setnowtimeqstring ="";
     ViewInformation viewinformation;
     lyric StructLyric;
+    QPixmap  pixmap;
     void  closeEvent(QCloseEvent *event);
 
     void  resizeEvent(QResizeEvent *);
@@ -100,6 +102,7 @@ public:
     void Lock();
     void Unlock();
     void SetAllLyric();
+
 signals:
 
 public slots:
