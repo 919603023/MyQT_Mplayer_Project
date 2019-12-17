@@ -30,6 +30,7 @@
 #include <QListWidgetItem>
 #include "myqpushbutton.h"
 #include "myqgroup.h"
+
 typedef   struct
 {
     int time;
@@ -88,7 +89,7 @@ public:
     ViewInformation viewinformation;
     lyric StructLyric;
     void  closeEvent(QCloseEvent *event);
-void InsterListWidget(lyric *(&val));
+
     void  resizeEvent(QResizeEvent *);
     void ReadDir(char *val);
     void Initialize();
@@ -106,15 +107,17 @@ public slots:
    void SlotMusicNext(void);
    void SlotMusicFront(void);
    void SlotTimeOut(void);
-   void SlotVulmeHide(void);
-   void SlotVulmeShow(void);
+//   void SlotVulmeHide(void);
+//   void SlotVulmeShow(void);
    void SlotProgressValue(int val);
    void SlotSliderPressed(void);
    void SlotSliderReleased(void);
    void SlotQPushButtonShowAllLyric(void);
    void SlotQPushButtonvolume(void);
-   void SlotQPushButtonMysignalsEnter(void);
-   void SlotQPushButtonMysignalsLeave(void);
+
+//   void SlotQPushButtonMysignalsEnter(void);
+//   void SlotQPushButtonMysignalsLeave(void);
+
    void SlotQGroupBoxMysignalsEnter(void);
    void SlotQGroupBoxMysignalsLeave(void);
 

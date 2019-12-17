@@ -18,7 +18,7 @@
     <property name="geometry">
      <rect>
       <x>140</x>
-      <y>290</y>
+      <y>320</y>
       <width>371</width>
       <height>16</height>
      </rect>
@@ -31,7 +31,7 @@
     <property name="geometry">
      <rect>
       <x>60</x>
-      <y>290</y>
+      <y>320</y>
       <width>67</width>
       <height>17</height>
      </rect>
@@ -43,8 +43,8 @@
    <widget class="QLabel" name="label_totaltime">
     <property name="geometry">
      <rect>
-      <x>530</x>
-      <y>290</y>
+      <x>540</x>
+      <y>320</y>
       <width>67</width>
       <height>17</height>
      </rect>
@@ -244,42 +244,6 @@
      </item>
     </layout>
    </widget>
-   <widget class="QGroupBox" name="groupBox">
-    <property name="geometry">
-     <rect>
-      <x>670</x>
-      <y>140</y>
-      <width>51</width>
-      <height>161</height>
-     </rect>
-    </property>
-    <property name="title">
-     <string/>
-    </property>
-    <widget class="QSlider" name="huds">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>60</y>
-       <width>16</width>
-       <height>101</height>
-      </rect>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-    </widget>
-    <widget class="QSpinBox" name="spinBox_huds">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>30</y>
-       <width>42</width>
-       <height>26</height>
-      </rect>
-     </property>
-    </widget>
-   </widget>
    <widget class="MyQPushButton" name="pushButton_volume">
     <property name="geometry">
      <rect>
@@ -296,9 +260,9 @@
    <widget class="QPushButton" name="pushButton_showalllyric">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>140</y>
-      <width>89</width>
+      <x>30</x>
+      <y>130</y>
+      <width>21</width>
       <height>25</height>
      </rect>
     </property>
@@ -309,10 +273,46 @@
    <widget class="QListWidget" name="listWidget_2">
     <property name="geometry">
      <rect>
-      <x>110</x>
-      <y>90</y>
+      <x>120</x>
+      <y>120</y>
       <width>331</width>
       <height>192</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="MyQGroup" name="groupBox">
+    <property name="geometry">
+     <rect>
+      <x>670</x>
+      <y>140</y>
+      <width>51</width>
+      <height>161</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>GroupBox</string>
+    </property>
+   </widget>
+   <widget class="QSlider" name="huds">
+    <property name="geometry">
+     <rect>
+      <x>750</x>
+      <y>200</y>
+      <width>16</width>
+      <height>101</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Vertical</enum>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="spinBox_huds">
+    <property name="geometry">
+     <rect>
+      <x>730</x>
+      <y>160</y>
+      <width>42</width>
+      <height>26</height>
      </rect>
     </property>
    </widget>
@@ -333,6 +333,12 @@
    <class>MyQPushButton</class>
    <extends>QPushButton</extends>
    <header>myqpushbutton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>MyQGroup</class>
+   <extends>QGroupBox</extends>
+   <header>myqgroup.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>
