@@ -11,13 +11,9 @@ struct adsf
 };
 int main(int argc, char *argv[])
 {
-<<<<<<< HEAD
 
-=======
-    sem_init(&sem1,0,1);
-    sem_init(&sem2,0,0);
-    sem_init(&sem3,0,0);
->>>>>>> 2fafa18ab2eb25def7a5e711a20398672fb56fc4
+
+
     pthread_mutex_init(&mutex,NULL);
     int ret = mkfifo("fifo_cmd",0664);
     int ret2 = mkfifo("Myfifo",0664);

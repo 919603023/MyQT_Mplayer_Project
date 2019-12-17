@@ -12,11 +12,10 @@ int PuaesFlag= 0;
 //sem_t *sem;
 
 
-<<<<<<< HEAD
+
 #define N 0
-=======
-sem_t sem1,sem2,sem3;
->>>>>>> 2fafa18ab2eb25def7a5e711a20398672fb56fc4
+
+
 pthread_mutex_t mutex;
 QList<lyric*> Lyriclist;
 MainWindow::MainWindow(QWidget *parent)
@@ -135,17 +134,21 @@ void MainWindow::ReadDir(char *val)
         }
 
         }
-<<<<<<< HEAD
 
 
     closedir(dir);
 }
-=======
->>>>>>> 2fafa18ab2eb25def7a5e711a20398672fb56fc4
+
+
+
+
+
+
+
 
 void MainWindow::MyCutSong()
 {
-#if 1
+
    usleep(500);
 //   lyric l;
 //   Lyriclist.push_back(l);
@@ -156,25 +159,7 @@ void MainWindow::MyCutSong()
 //       Lyric[i] = val;
 //   }
 
-<<<<<<< HEAD
-=======
-    closedir(dir);
-}
 
-void MainWindow::MyCutSong()
-{
-#if 1
-   usleep(500);
-//   lyric l;
-//   Lyriclist.push_back(l);
-//  Lyriclist.clear();
-//   for(int i = 0;i < 128;i++)
-//   {
-//       lyric *val = (lyric*)malloc(sizeof (int)+256);
-//       Lyric[i] = val;
-//   }
-
->>>>>>> 2fafa18ab2eb25def7a5e711a20398672fb56fc4
    char buff[128] = "";
    char Site[128] = "";
    int val1,val2,val3;
@@ -215,7 +200,6 @@ void MainWindow::MyCutSong()
       Lyric[i]->row = i-1;
      Lyric[i]->time = val1*600+val2*10;
 
-
       usleep(5000);
        Lyriclist.push_back(Lyric[i]);
 
@@ -242,6 +226,7 @@ fclose(MyFd);
 
 return;
 }
+#if N
 #endif
 }
 
@@ -256,21 +241,20 @@ char* MainWindow::MyFindLyric()
         return "NO_HAVE_LYRIC";
     }
     usleep(5000);
-<<<<<<< HEAD
+
 
     std::for_each(Lyriclist.begin(),Lyriclist.end(),[=](lyric* val ){
         if(viewinformation.NowTime *10 == val->time)        {
 
             strcpy(MyBuff,val->MyLyric);
 #if N
-=======
-#if 1
+
     std::for_each(Lyriclist.begin(),Lyriclist.end(),[=](lyric* val ){
         if(viewinformation.NowTime *10 == val->time)        {
 
             strcpy(MyBuff,val->MyLyric);
 
->>>>>>> 2fafa18ab2eb25def7a5e711a20398672fb56fc4
+
             ui->listWidget_2->setCurrentRow(val->row+5);
 
             ui->listWidget_2->setCurrentRow(val->row+3);
@@ -282,30 +266,22 @@ char* MainWindow::MyFindLyric()
 
             ui->listWidget_2->item(val->row+3)->setTextColor(QColor(255,0,0,255));
             printf("bengle \n");
-<<<<<<< HEAD
+
 #endif            fflush(stdout);
         }
     });
 
-=======
-            fflush(stdout);
-        }
-    });
-#endif
->>>>>>> 2fafa18ab2eb25def7a5e711a20398672fb56fc4
+
     return MyBuff;
 }
 void MainWindow::SetAllLyric()
 {
     usleep(100*100);
     ui->listWidget_2->clear();
-    if(Lyriclist.count() != 0)
-    {
-<<<<<<< HEAD
+
+
 #if N
-=======
-#if 1
->>>>>>> 2fafa18ab2eb25def7a5e711a20398672fb56fc4
+
         QList<lyric*>::iterator it = Lyriclist.begin();
 
         while(it != Lyriclist.end())
@@ -318,7 +294,7 @@ void MainWindow::SetAllLyric()
         }
 #endif
     }
-}
+
 void MainWindow::SetInformation()
 {
     viewinformation.hub =  ui->spinBox_huds->value();
