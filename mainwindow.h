@@ -55,6 +55,7 @@ struct ViewInformation
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
+extern sem_t sem1,sem2,sem3;
 extern void *MyPrint(void *arg);
 extern void *MyGetTimeAndBar(void *arg);
 extern void *MySendMsgToMplayer(void *arg);

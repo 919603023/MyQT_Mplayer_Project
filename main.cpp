@@ -11,6 +11,9 @@ struct adsf
 };
 int main(int argc, char *argv[])
 {
+    sem_init(&sem1,0,1);
+    sem_init(&sem2,0,0);
+    sem_init(&sem3,0,0);
     pthread_mutex_init(&mutex,NULL);
     int ret = mkfifo("fifo_cmd",0664);
     int ret2 = mkfifo("Myfifo",0664);
@@ -54,9 +57,9 @@ int main(int argc, char *argv[])
     pthread_create(&send_mplayer,NULL,MySendMsgToMplayer,NULL);
     pthread_detach(send_mplayer);
 
-    pthread_t myprint;
-    pthread_create(&myprint,NULL,MyPrint,(void *)&w);
-    pthread_detach(myprint);
+//    pthread_t myprint;
+//    pthread_create(&myprint,NULL,MyPrint,(void *)&w);
+//    pthread_detach(myprint);
 
     QTextCodec *codec = QTextCodec::codecForName("utf8");
     adsf d;
@@ -68,5 +71,7 @@ int main(int argc, char *argv[])
 
 
     return a.exec();
+    sem_post(&sem2);
+
     }
 }
