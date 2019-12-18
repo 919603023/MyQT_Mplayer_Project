@@ -53,14 +53,13 @@ MainWindow::MainWindow(QWidget *parent)
 
             connect(ui->pushButton_showalllyric,SIGNAL(clicked()),this,SLOT(SlotQPushButtonShowAllLyric()));
 
-            connect(ui->pushButton_volume,SIGNAL(clicked()),this,SLOT(SlotQGroupBoxMysignalsEnter()));
+            connect(ui->pushButton_volume,SIGNAL(clicked()),this,SLOT(SlotQPushButtonvolumeShow()));
+
+            connect(ui->pushButton_4,SIGNAL(clicked()),this,SLOT( SlotQPushButtonMute()));
 
             connect(ui->pushButton_volume,SIGNAL(clicked()),this,SLOT(SlotQGroupBoxMysignalsLeave()));
 
-//   connect(ui->groupBox,SIGNAL(QGroupMysignalsLeave()),this,SLOT(SlotQGroupBoxMysignalsLeave()));
-//    connect(ui->groupBox,SIGNAL(QGroupMysignalsEnter()),this,SLOT(SlotQGroupBoxMysignalsEnter()));
             connect(ui->pushButton_volume,SIGNAL(clicked()),this,SLOT(SlotQPushButtonvolume()));
-
 
             connect(ui->huds, &QSlider::valueChanged, ui->spinBox_huds, &QSpinBox::setValue);
 
@@ -75,18 +74,10 @@ MainWindow::MainWindow(QWidget *parent)
 
             connect(time,SIGNAL(timeout()),this,SLOT(SlotTimeOut()));
 
-//    connect(ui->pushButton_volume,SIGNAL(Mysignalsvulmehide()),this,SLOT(SlotVulmeHide()));
-//    connect(ui->pushButton_volume,SIGNAL(Mysignalsvulmeshow()),this,SLOT(SlotVulmeShow()));
-    connect(ui->progress_bar,SIGNAL(valueChanged(int)),this,SLOT(SlotProgressValue(int)));
+            connect(ui->progress_bar,SIGNAL(valueChanged(int)),this,SLOT(SlotProgressValue(int)));
 
+            connect(ui->pushButton_2,&QPushButton::clicked,[=](){
 
-    connect(ui->pushButton_2,&QPushButton::clicked,[=](){
-//        if(ui->lineEdit->text() != "")
-//        {
-//                pixmap.load(ui->lineEdit->text());
-//                this->setFixedSize(800,451);
-//                this->setFixedSize(800,450);
-//        }
          QString val = QFileDialog::getOpenFileName(this,"open","../","JPG(*.jpg)");
          if(val == "")
          {
@@ -96,23 +87,8 @@ MainWindow::MainWindow(QWidget *parent)
          this->setFixedSize(800,450);
 
     });
- /*
-    connect(ui->pushButton,&MyQPushButton::QPushButonMysignalsEnter,[=]{
-       ui->groupBox_2->show();
-    });
-    connect(ui->pushButton,&MyQPushButton::QPushButonMysignalsLeave,[=]{
-       ui->groupBox_2->hide();
-    });
-    connect(ui->groupBox_2,&MyQGroup::QGroupMysignalsEnter,[=]{
-        ui->groupBox_2->show();
-    });
-    connect(ui->groupBox_2,&MyQGroup::QGroupMysignalsLeave,[=]{
-        ui->groupBox_2->hide();
-    });
-    ui->groupBox_2->hide();
-*/
 
-//this->setWindowFlags(Qt::FramelessWindowHint);
+        //this->setWindowFlags(Qt::FramelessWindowHint);
 }
 MainWindow::~MainWindow()
 {
@@ -132,7 +108,7 @@ void MainWindow::Initialize()
 
     imageRotate = 0;
 
-    CutSong = 0;
+    VolueButtonFlag = 0;
 
     MuteFlag = 0;
 
@@ -142,9 +118,13 @@ void MainWindow::Initialize()
 
     this->setFixedSize(800, 450);
 
-    ui->spinBox_huds->setValue(99);
+    ui->spinBox_huds->setMaximum(100);
 
-    ui->huds->setValue(99);
+    ui->spinBox_huds->setValue(50);
+
+    ui->huds->setMaximum(100);
+
+    ui->huds->setValue(50);
 
     ui->pushButton_3->hide();
 
@@ -696,7 +676,25 @@ void MainWindow::SlotQPushButtonShowAllLyric()
     }
 }
 
-void MainWindow::SlotQPushButtonvolume()
+void MainWindow::SlotQPushButtonvolumeShow()
+{
+
+
+    if(VolueButtonFlag == 0)
+    {
+
+        VolueButtonFlag = 1;
+        ui->groupBox->show();
+
+
+    }
+    else
+    {
+        VolueButtonFlag = 0;
+        ui->groupBox->hide();
+    }
+}
+void MainWindow::SlotQPushButtonMute()
 {
 
 
@@ -714,7 +712,6 @@ void MainWindow::SlotQPushButtonvolume()
         ui->huds->setValue(viewinformation.mutehub);
     }
 }
-
 // clicke the pause button
 void MainWindow::SlotMyClickedPlaying()
 {

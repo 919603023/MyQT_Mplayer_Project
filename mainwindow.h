@@ -96,24 +96,40 @@ public:
     ~MainWindow();
 
     int imageRotate;
+
     QPixmap disc;
+
     int fd;
+
     char buf[128];
+
     int OpenFlag;
-    int CutSong;
-    int Volue;
+
+    int VolueButtonFlag;
+
     int MuteFlag;
+
     pid_t pid;
+
     char MyBuff[128];
+
     int HaveLyricFlag;
+
     int SpliderPress;
+
     int ShowAllLyric;
+
     QList<int> LyriclistTime;
+
     QList<int> lyriclistRow;
+
     QList<QString> LyriclistLyric;
+
     QString setnowtimeqstring ;
+
     ViewInformation viewinformation;
-//    lyric StructLyric;
+
+
     QPixmap  pixmap;
 
     friend void *MyGetTimeAndBar(void *arg);
@@ -143,7 +159,7 @@ public:
 
     void  resizeEvent(QResizeEvent *);
 
-  void  paintEvent(QPaintEvent *);
+    void  paintEvent(QPaintEvent *);
 
 
 
@@ -158,11 +174,8 @@ public slots:
 
    void SlotMusicFront(void);
 
-
    void SlotTimeOut(void);
 
-//   void SlotVulmeHide(void);
-//   void SlotVulmeShow(void);
    void SlotProgressValue(int val);
 
    void SlotSliderPressed(void);
@@ -171,7 +184,9 @@ public slots:
 
    void SlotQPushButtonShowAllLyric(void);
 
-   void SlotQPushButtonvolume(void);
+   void SlotQPushButtonvolumeShow(void);
+
+   void SlotQPushButtonMute(void);
 
 
 private slots:
