@@ -6,6 +6,7 @@ int PuaesFlag= 0;
 #define N 0
 
 pthread_mutex_t mutex;
+pthread_mutex_t mutex2;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -106,6 +107,10 @@ void MainWindow::Initialize()
     }
     OpenFlag = 0;
 
+    Mode = 0;
+
+    Frist = 0;
+
     imageRotate = 0;
 
     VolueButtonFlag = 0;
@@ -115,6 +120,30 @@ void MainWindow::Initialize()
     HaveLyricFlag = 0;
 
     ShowAllLyric = 0;
+
+    viewinformation.hub = 0;
+
+    viewinformation.song = "";
+
+
+    viewinformation.album = "";
+
+    viewinformation.lyric = "";
+
+    viewinformation.singer = "";
+
+    viewinformation.AllTime = 0;
+
+    viewinformation.NowTime = 0;
+
+    viewinformation.alltime = "";
+
+    viewinformation.mutehub = 0;
+
+    viewinformation.nowtime = "";
+
+    viewinformation.progress = 0;
+
 
     this->setFixedSize(800, 450);
 
@@ -166,6 +195,11 @@ void MainWindow::Initialize()
     ui->groupBox->hide();
 
     bzero(buf,sizeof(buf));
+
+    this->setWindowTitle("奥利给播放器");
+
+    this->setWindowIcon(QIcon(":/res/img/gei.png"));
+
     ReadDir("../MyQT_Mplayer_Project/song/");
 
 }
@@ -208,7 +242,7 @@ void MainWindow::ReadDir(char *val)
     closedir(dir);
 }
 
-void MainWindow::MyCutSong()
+void MainWindow::GetLyric()
 {
 
     usleep(500);
@@ -373,10 +407,63 @@ void MainWindow::SetAllLyric()
 #endif
 }
 
+void MainWindow::CutSong(char *val)
+{
+    switch (Mode) {
+    case 0:
+        if(QString(val) == "last")
+        {
+            if(ui->listWidget->currentRow() == 0)//当光标在第一个文件时，点击上一个光标移动到最下面的文件，不播放
+            {
+                  ui->listWidget->setCurrentRow(ui->listWidget->count()-1);
+             }
+            else
+              {
+                  ui->listWidget->setCurrentRow(ui->listWidget->currentRow()-1);
+               }
+        }
+        else
+        {
+            if(ui->listWidget->currentRow() == ui->listWidget->count()-1)
+            {
+                ui->listWidget->setCurrentRow(0);//当光标在最后一个文件时，点击下一个，光标移动到第一个，不播放
+            }
+            else
+            {
+                ui->listWidget->setCurrentRow(ui->listWidget->currentRow()+1);
+            }
+        }
+        break;
+    case 1:
+       ui->listWidget->setCurrentRow( ui->listWidget->currentRow());
+        break;
+    case 2:
+        ui->listWidget->setCurrentRow(qrand()%ui->listWidget->count());
+        break;
+    case 3:
+        return;
+
+
+
+
+    }
+
+    char buff[128]= {0};
+    strcpy(buf,QStringToChar(ui->listWidget->currentItem()->text()));
+    sprintf(buff,"loadfile \"../MyQT_Mplayer_Project/song/%s\"\n",buf);
+    SendMsgToMplayer(buff);
+
+    GetLyric();
+    Unlock();
+    usleep(500);
+    ui->progress_bar->setMaximum(viewinformation.AllTime);
+}
+
 void MainWindow::SetInformation()
 {
     viewinformation.hub =  ui->spinBox_huds->value();
     viewinformation.song = buf;
+    viewinformation.progress = viewinformation.NowTime;
     if(HaveLyricFlag == 1)
     {
         if(MyFindLyric() != "__nohave")
@@ -396,6 +483,7 @@ void MainWindow::PrintInformation()
 {
 
    ui->progress_bar->setMaximum(viewinformation.AllTime);
+   qDebug()<<viewinformation.AllTime;
 
    ui->huds->setValue(viewinformation.hub);
 
@@ -410,8 +498,9 @@ void MainWindow::PrintInformation()
    ui->label_nowtime->setText(viewinformation.nowtime);
 
    ui->label_totaltime->setText(QString(viewinformation.alltime));
-
+    usleep(6666);
    ui->progress_bar->setValue(viewinformation.NowTime);
+   qDebug()<<viewinformation.NowTime;
 
 
 
@@ -445,9 +534,11 @@ void MainWindow::Unlock()
 
 void SendMsgToMplayer(char *val)
 {
+    pthread_mutex_lock(&mutex2);
    int fd = open("fifo_cmd",O_RDWR);
     write(fd,val,strlen(val));
     close(fd);
+    pthread_mutex_unlock(&mutex2);
 }
 
 char *QStringToChar(QString val)
@@ -460,11 +551,12 @@ void *MySendMsgToMplayer(void *arg)
 {
 
 
-    sleep(2);
+
         //不停的给fifo_cmd发送获取当前时间以及进度
         while(1)
         {
             pthread_mutex_lock(&mutex);
+
 
             usleep(800*100);//0.05秒发指令
             SendMsgToMplayer("get_percent_pos\n");
@@ -475,6 +567,7 @@ void *MySendMsgToMplayer(void *arg)
             usleep(800*100);//0.05秒发指令
             SendMsgToMplayer("get_meta_artist\n");
            pthread_mutex_unlock(&mutex);
+
            usleep(800*100);//0.05秒发指令
 
         }
@@ -514,6 +607,17 @@ void *MyGetTimeAndBar(void *arg)
 
                   m->SetTimeQstring(time_pos,m->viewinformation.nowtime);
                   m->viewinformation.NowTime = time_pos;
+                  if(m->viewinformation.NowTime == m->viewinformation.AllTime-2 )
+                  {
+
+
+
+
+
+
+
+
+                  }
 //                  printf("%d\n",m->viewinformation.NowTime);
 //                  fflush(stdout);
 //                  printf("%d\n",time_pos);
@@ -572,50 +676,57 @@ void *MyPrint(void *arg)
 
 void MainWindow::SlotMusicFront()
 {
-    if(ui->listWidget->currentRow() == 0)//当光标在第一个文件时，点击上一个光标移动到最下面的文件，不播放
-    {
-        ui->listWidget->setCurrentRow(ui->listWidget->count()-1);
-    }
-    else
-    {
-        ui->listWidget->setCurrentRow(ui->listWidget->currentRow()-1);
-    }
-    char buff[128]= {0};
-    strcpy(buf,QStringToChar(ui->listWidget->currentItem()->text()));
-    sprintf(buff,"loadfile \"../MyQT_Mplayer_Project/song/%s\"\n",buf);
-    SendMsgToMplayer(buff);
+//    if(ui->listWidget->currentRow() == 0)//当光标在第一个文件时，点击上一个光标移动到最下面的文件，不播放
+//    {
+//        ui->listWidget->setCurrentRow(ui->listWidget->count()-1);
+//    }
+//    else
+//    {
+//        ui->listWidget->setCurrentRow(ui->listWidget->currentRow()-1);
+//    }
+//    char buff[128]= {0};
+//    strcpy(buf,QStringToChar(ui->listWidget->currentItem()->text()));
+//    sprintf(buff,"loadfile \"../MyQT_Mplayer_Project/song/%s\"\n",buf);
+//    SendMsgToMplayer(buff);
 
-    MyCutSong();
-    Unlock();
-    usleep(500);
-    ui->progress_bar->setMaximum(viewinformation.AllTime);
+//    GetLyric();
+//    Unlock();
+//    usleep(500);
+//    ui->progress_bar->setMaximum(viewinformation.AllTime);
+
+    CutSong("last");
 
 }
 
 void MainWindow::SlotMusicNext()
 {
-    if(ui->listWidget->currentRow() == ui->listWidget->count()-1)
-    {
-        ui->listWidget->setCurrentRow(0);//当光标在最后一个文件时，点击下一个，光标移动到第一个，不播放
-    }
-    else
-    {
-        ui->listWidget->setCurrentRow(ui->listWidget->currentRow()+1);
-    }
-    char buff[128]= {0};
-    strcpy(buf,QStringToChar(ui->listWidget->currentItem()->text()));
-    sprintf(buff,"loadfile \"../MyQT_Mplayer_Project/song/%s\"\n",buf);
-    SendMsgToMplayer(buff);
-    MyCutSong();
-    Unlock();
-    usleep(500);
-    ui->progress_bar->setMaximum(viewinformation.AllTime);
+//    if(ui->listWidget->currentRow() == ui->listWidget->count()-1)
+//    {
+//        ui->listWidget->setCurrentRow(0);//当光标在最后一个文件时，点击下一个，光标移动到第一个，不播放
+//    }
+//    else
+//    {
+//        ui->listWidget->setCurrentRow(ui->listWidget->currentRow()+1);
+//    }
+//    char buff[128]= {0};
+//    strcpy(buf,QStringToChar(ui->listWidget->currentItem()->text()));
+//    sprintf(buff,"loadfile \"../MyQT_Mplayer_Project/song/%s\"\n",buf);
+//    SendMsgToMplayer(buff);
+//    GetLyric();
+//    Unlock();
+//    usleep(500);
+//    ui->progress_bar->setMaximum(viewinformation.AllTime);
+    CutSong("next");
 
 }
 
 void MainWindow::SlotTimeOut()
 {
-
+//if(Frist == 0)
+//{
+//    sleep(2);
+//   Frist = 1;
+//}
     SetInformation();
     PrintInformation();
     if(PuaesFlag == 0)
@@ -631,7 +742,21 @@ void MainWindow::SlotTimeOut()
        fflush(stdout);
 
     }
+usleep(500*10);
+    if(viewinformation.NowTime == viewinformation.AllTime-2 && buf != "")
+    {
+
+
+            CutSong("next");
+            viewinformation.NowTime = 0;
+
+
+
+
+
+    }
     update();
+
 
 }
 
@@ -734,7 +859,7 @@ void MainWindow::SlotMyDoubleClickedList(QListWidgetItem *item)
             strcpy(buf,QStringToChar(item->text()));
             sprintf(buff,"loadfile \"../MyQT_Mplayer_Project/song/%s\"\n",buf);
             SendMsgToMplayer(buff);
-            MyCutSong();
+            GetLyric();
             Unlock();
 }
 
@@ -791,4 +916,16 @@ void MainWindow::on_pushButton_3_clicked()
 {
     ui->stackedWidget->setCurrentIndex(0);
     ui->pushButton_3->hide();
+}
+
+void MainWindow::on_pushButton_5_clicked()
+{
+    switch (Mode) {
+    case 0 : Mode = 1;break;
+    case 1 : Mode = 2;break;
+    case 2 : Mode = 3;break;
+    case 3 : Mode = 0;break;
+
+
+    }
 }

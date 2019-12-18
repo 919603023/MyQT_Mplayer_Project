@@ -45,6 +45,7 @@
 #include<QDebug>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <ctime>
 
 struct ViewInformation
 {
@@ -86,6 +87,8 @@ extern char *QStringToChar(QString val);
 
 extern pthread_mutex_t mutex;
 
+extern pthread_mutex_t mutex2;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -119,6 +122,10 @@ public:
 
     int ShowAllLyric;
 
+    int Frist;
+
+    int Mode;
+
     QList<int> LyriclistTime;
 
     QList<int> lyriclistRow;
@@ -134,7 +141,7 @@ public:
 
     friend void *MyGetTimeAndBar(void *arg);
 
-    void MyCutSong();
+    void GetLyric();
 
     QString MyFindLyric();
 
@@ -153,6 +160,8 @@ public:
     void Unlock();
 
     void SetAllLyric();
+
+    void CutSong(char *val);
 
 
     void  closeEvent(QCloseEvent *event);
@@ -193,6 +202,8 @@ private slots:
    void on_pushButton_clicked();
 
    void on_pushButton_3_clicked();
+
+   void on_pushButton_5_clicked();
 
 private:
     Ui::MainWindow *ui;

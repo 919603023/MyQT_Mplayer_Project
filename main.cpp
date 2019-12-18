@@ -15,6 +15,7 @@ int main(int argc, char *argv[])
 
 
     pthread_mutex_init(&mutex,NULL);
+    pthread_mutex_init(&mutex2,NULL);
     int ret = mkfifo("fifo_cmd",0664);
     int ret2 = mkfifo("Myfifo",0664);
      int fd1[2];

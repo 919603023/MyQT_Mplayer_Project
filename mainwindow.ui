@@ -333,7 +333,7 @@
      </rect>
     </property>
     <property name="title">
-     <string>GroupBox</string>
+     <string/>
     </property>
     <widget class="QSpinBox" name="spinBox_huds">
      <property name="geometry">
@@ -348,8 +348,8 @@
     <widget class="QSlider" name="huds">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>40</y>
+       <x>10</x>
+       <y>50</y>
        <width>16</width>
        <height>101</height>
       </rect>
@@ -361,8 +361,8 @@
     <widget class="QPushButton" name="pushButton_4">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>150</y>
+       <x>10</x>
+       <y>160</y>
        <width>21</width>
        <height>25</height>
       </rect>
@@ -396,6 +396,19 @@
     </property>
     <property name="text">
      <string>back</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_5">
+    <property name="geometry">
+     <rect>
+      <x>620</x>
+      <y>340</y>
+      <width>89</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>mode</string>
     </property>
    </widget>
   </widget>
