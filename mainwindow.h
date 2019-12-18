@@ -33,12 +33,6 @@
 #include "myqgroup.h"
 #include <exception>
 
-//typedef   struct
-//{
-//    int time;
-//    int row;
-//    char MyLyric[256];
-//}lyric;
 struct ViewInformation
 {
     QString song;
@@ -55,27 +49,41 @@ struct ViewInformation
 };
 
 QT_BEGIN_NAMESPACE
+
 namespace Ui { class MainWindow; }
+
 QT_END_NAMESPACE
-extern sem_t sem1,sem2,sem3;
+
 extern void *MyPrint(void *arg);
+
 extern void *MyGetTimeAndBar(void *arg);
+
 extern void *MySendMsgToMplayer(void *arg);
+
 extern void SetSeekBarFindViewById(int val);
+
 extern void TotalTime(float val);
+
 extern void SetNowTimeQstring(float val);
+
 extern void SendMsgToMplayer(char *val);
+
 extern char *QStringToChar(QString val);
+
+
 extern pthread_mutex_t mutex;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
     MainWindow(QWidget *parent = nullptr);
+
     ~MainWindow();
-    void MyCutSong();
-    char*MyFindLyric();
+
+
+
     int fd;
     char buf[128];
     int OpenFlag;
@@ -86,45 +94,73 @@ public:
     char MyBuff[128];
     int HaveLyricFlag;
     int SpliderPress;
-//    lyric *Lyric[128];
     int ShowAllLyric;
-    QString setnowtimeqstring ="";
+    QList<int> LyriclistTime;
+    QList<int> lyriclistRow;
+    QList<QString> LyriclistLyric;
+    QString setnowtimeqstring ;
     ViewInformation viewinformation;
 //    lyric StructLyric;
     QPixmap  pixmap;
+
+    friend void *MyGetTimeAndBar(void *arg);
+
+    void MyCutSong();
+
+    char*MyFindLyric();
+
+    void ReadDir(char *val);
+
+    void Initialize();
+
+    void PrintInformation();
+
+    void SetInformation();
+
+    void SetTimeQstring(float val,QString &val1);
+
+    void Lock();
+
+    void Unlock();
+
+    void SetAllLyric();
+
+
     void  closeEvent(QCloseEvent *event);
 
     void  resizeEvent(QResizeEvent *);
-    void ReadDir(char *val);
-    void Initialize();
-    void PrintInformation();
-    void SetInformation();
-    void SetTimeQstring(float val,QString &val1);
-    void Lock();
-    void Unlock();
-    void SetAllLyric();
 
 signals:
 
 public slots:
    void SlotMyClickedPlaying(void);
+
    void SlotMyDoubleClickedList(QListWidgetItem *item);
+
    void SlotMusicNext(void);
+
    void SlotMusicFront(void);
+
+
    void SlotTimeOut(void);
+
 //   void SlotVulmeHide(void);
 //   void SlotVulmeShow(void);
    void SlotProgressValue(int val);
+
    void SlotSliderPressed(void);
+
    void SlotSliderReleased(void);
+
    void SlotQPushButtonShowAllLyric(void);
+
    void SlotQPushButtonvolume(void);
 
-//   void SlotQPushButtonMysignalsEnter(void);
-//   void SlotQPushButtonMysignalsLeave(void);
 
-   void SlotQGroupBoxMysignalsEnter(void);
-   void SlotQGroupBoxMysignalsLeave(void);
+private slots:
+   void on_pushButton_clicked();
+
+   void on_pushButton_3_clicked();
 
 private:
     Ui::MainWindow *ui;

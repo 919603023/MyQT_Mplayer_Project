@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
 
 
     return a.exec();
-    sem_post(&sem2);
+
 
     }
 }

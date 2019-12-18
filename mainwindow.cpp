@@ -1,53 +1,52 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-//QString ARTIST;
-//int LENGTH;
-//int AllTime = 0;
+
 int PuaesFlag= 0;
-//QString ALBUMNAME;
-//int setseekbarfindviewbyid = 0;
-//int setnowtime = 0;
-//float totaltime = 0;
-
-//sem_t *sem;
-
-
 
 #define N 0
 
-
 pthread_mutex_t mutex;
 
-QList<int> LyriclistTime;
-QList<int> lyriclistRow;
-QList<QString> LyriclistLyric;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
 //  ui->widget->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
-ui->setupUi(this);
-    Initialize();
+             ui->setupUi(this);
+            Initialize();
 
-QTimer *time = new QTimer(this);
-time->start(500);
- pixmap.load(":/res/img/bg.jpg");
-    connect(ui->pushButton_showalllyric,SIGNAL(clicked()),this,SLOT(SlotQPushButtonShowAllLyric()));
-    connect(ui->pushButton_volume,SIGNAL(clicked()),this,SLOT(SlotQGroupBoxMysignalsEnter()));
-    connect(ui->pushButton_volume,SIGNAL(clicked()),this,SLOT(SlotQGroupBoxMysignalsLeave()));
+            QTimer *time = new QTimer(this);
+            time->start(500);
+            pixmap.load(":/res/img/bg.jpg");
+
+            connect(ui->pushButton_showalllyric,SIGNAL(clicked()),this,SLOT(SlotQPushButtonShowAllLyric()));
+
+            connect(ui->pushButton_volume,SIGNAL(clicked()),this,SLOT(SlotQGroupBoxMysignalsEnter()));
+
+            connect(ui->pushButton_volume,SIGNAL(clicked()),this,SLOT(SlotQGroupBoxMysignalsLeave()));
+
 //   connect(ui->groupBox,SIGNAL(QGroupMysignalsLeave()),this,SLOT(SlotQGroupBoxMysignalsLeave()));
 //    connect(ui->groupBox,SIGNAL(QGroupMysignalsEnter()),this,SLOT(SlotQGroupBoxMysignalsEnter()));
-    connect(ui->pushButton_volume,SIGNAL(clicked()),this,SLOT(SlotQPushButtonvolume()));
-    connect(ui->huds, &QSlider::valueChanged, ui->spinBox_huds, &QSpinBox::setValue);
+            connect(ui->pushButton_volume,SIGNAL(clicked()),this,SLOT(SlotQPushButtonvolume()));
+
+
+            connect(ui->huds, &QSlider::valueChanged, ui->spinBox_huds, &QSpinBox::setValue);
+
        //当改变选值框的值时，同时进度条也改变位置
-    connect(ui->pushButton_pause,SIGNAL(clicked()),this,SLOT(SlotMyClickedPlaying()));
-    connect(ui->listWidget,SIGNAL(itemDoubleClicked(QListWidgetItem*)),this,SLOT(SlotMyDoubleClickedList(QListWidgetItem *)));
-    connect(ui->pushButton_last,SIGNAL(clicked()),this,SLOT(SlotMusicFront()));
-    connect(ui->pushButton_next,SIGNAL(clicked()),this,SLOT(SlotMusicNext()));
-    connect(time,SIGNAL(timeout()),this,SLOT(SlotTimeOut()));
+            connect(ui->pushButton_pause,SIGNAL(clicked()),this,SLOT(SlotMyClickedPlaying()));
+
+            connect(ui->listWidget,SIGNAL(itemDoubleClicked(QListWidgetItem*)),this,SLOT(SlotMyDoubleClickedList(QListWidgetItem *)));
+
+            connect(ui->pushButton_last,SIGNAL(clicked()),this,SLOT(SlotMusicFront()));
+
+            connect(ui->pushButton_next,SIGNAL(clicked()),this,SLOT(SlotMusicNext()));
+
+            connect(time,SIGNAL(timeout()),this,SLOT(SlotTimeOut()));
+
 //    connect(ui->pushButton_volume,SIGNAL(Mysignalsvulmehide()),this,SLOT(SlotVulmeHide()));
 //    connect(ui->pushButton_volume,SIGNAL(Mysignalsvulmeshow()),this,SLOT(SlotVulmeShow()));
     connect(ui->progress_bar,SIGNAL(valueChanged(int)),this,SLOT(SlotProgressValue(int)));
+
 
     connect(ui->pushButton_2,&QPushButton::clicked,[=](){
         if(ui->lineEdit->text() != "")
@@ -82,51 +81,73 @@ MainWindow::~MainWindow()
 
 void MainWindow::Initialize()
 {
-     MuteFlag = 0;
 
-//    for(int i = 0;i < 128;i++)
-//    {
-//        lyric *val = new lyric;
-//        Lyric[i] = val;
-//    }
+    pthread_mutex_init(&mutex,NULL);
+
     fd = open("fifo_cmd",O_RDWR);
     if(fd < 0){
          perror("open wronly fifo");
     }
     OpenFlag = 0;
+
     CutSong = 0;
-    pthread_mutex_init(&mutex,NULL);
+
+    MuteFlag = 0;
 
     HaveLyricFlag = 0;
-    this->setFixedSize(800, 450);
-    ui->spinBox_huds->setValue(99);
-    ui->huds->setValue(99);
-
-    ui->label_lyric->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
-    ui->label_song->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
-    ui->label_album->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
-    ui->label_singer->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
-    ui->label_nowtime->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
-    ui->label_songname->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
-    ui->label_albumname->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
-    ui->label_totaltime->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
-    ui->label_singername->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
-    ui->listWidget->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
-    ui->listWidget_2->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
-    ui->pushButton_last->setShortcut(QKeySequence(Qt::Key_Left));
-    ui->pushButton_next->setShortcut(QKeySequence(Qt::Key_Right));
-    ui->pushButton_pause->setShortcut(QKeySequence(Qt::Key_Space));
-    ui->listWidget_2->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff); //垂直滚动条
-    ui->listWidget_2->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     ShowAllLyric = 0;
-   // ui->listWidget_2->hide();
+
+    this->setFixedSize(800, 450);
+
+    ui->spinBox_huds->setValue(99);
+
+    ui->huds->setValue(99);
+
+    ui->pushButton_3->hide();
+
+    ui->label_lyric->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
+
+    ui->label_song->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
+
+    ui->label_album->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
+
+    ui->label_singer->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
+
+    ui->label_nowtime->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
+
+    ui->label_songname->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
+
+    ui->label_albumname->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
+
+    ui->label_totaltime->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
+
+    ui->label_singername->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
+
+    ui->listWidget->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
+
+    ui->listWidget_2->setStyleSheet(QString("background-color: rgba(255, 255, 255, 55%);"));
+
+    ui->pushButton_last->setShortcut(QKeySequence(Qt::Key_Left));
+
+    ui->pushButton_next->setShortcut(QKeySequence(Qt::Key_Right));
+
+    ui->pushButton_pause->setShortcut(QKeySequence(Qt::Key_Space));
+
+    ui->listWidget_2->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff); //垂直滚动条
+
+    ui->listWidget_2->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+
+    ui->listWidget_2->hide();
+
     ui->groupBox->hide();
 
     bzero(buf,sizeof(buf));
     ReadDir("../MyQT_Mplayer_Project/song/");
 
 }
+
 void MainWindow::ReadDir(char *val)
 {
     DIR *dir = opendir(val);
@@ -165,13 +186,6 @@ void MainWindow::ReadDir(char *val)
     closedir(dir);
 }
 
-
-
-
-
-
-
-
 void MainWindow::MyCutSong()
 {
 
@@ -209,8 +223,6 @@ void MainWindow::MyCutSong()
                 {
                 sscanf(buff1,"[%02d:%02d.%02d]",&val1,&val2,&val3);
                 strcpy(buff,&(buff1[10]));
-                   // sprintf(buff," %s",buff);
-          //      strcpy(&(buff[strlen(buff)-2])," \n\0");
                 printf("%d----%s\n",val1*600+val2*10,buff);
                 fflush(stdout);
 
@@ -250,9 +262,6 @@ void MainWindow::MyCutSong()
 
     return;
 }
-#if N
-#endif
-
 
 char* MainWindow::MyFindLyric()
 {
@@ -305,6 +314,7 @@ if(int a =LyriclistTime.indexOf(viewinformation.NowTime) != -1)
     return MyBuff;
 }
 
+
 void MainWindow::SetAllLyric()
 {
     usleep(100*100);
@@ -336,7 +346,6 @@ void MainWindow::SetAllLyric()
         }
 #endif
 }
-
 
 void MainWindow::SetInformation()
 {
@@ -393,12 +402,14 @@ void MainWindow::SetTimeQstring(float val,QString &val1)
    sprintf(buff,"%02d:%02d",minute,second);
    val1 = QString(buff);
 }
+
 void MainWindow::Lock()
 {
     PuaesFlag = 1;
     pthread_mutex_lock(&mutex);
     SendMsgToMplayer("pause\n");
 }
+
 void MainWindow::Unlock()
 {
     SendMsgToMplayer("pause\n");
@@ -406,18 +417,19 @@ void MainWindow::Unlock()
     pthread_mutex_unlock(&mutex);
 }
 
-
 void SendMsgToMplayer(char *val)
 {
    int fd = open("fifo_cmd",O_RDWR);
     write(fd,val,strlen(val));
     close(fd);
 }
+
 char *QStringToChar(QString val)
 {
     QByteArray ba = val.toUtf8();
     return ba.data();
 }
+
 void *MySendMsgToMplayer(void *arg)
 {
 
@@ -441,13 +453,16 @@ void *MySendMsgToMplayer(void *arg)
 
         }
 }
+
 void *MyGetTimeAndBar(void *arg)
 {
+
     char val[128] = "";
     char buf[128] = "";
    int val1;
     char cmd[128] = "";
      MainWindow *m = (MainWindow *)arg;
+
        int fd  = open("Myfifo",O_RDONLY);
         while(1)
         {
@@ -506,6 +521,7 @@ void *MyGetTimeAndBar(void *arg)
 
         }
 }
+
 void *MyPrint(void *arg)
 {
 //    MainWindow *m = (MainWindow *)arg;
@@ -538,14 +554,14 @@ void MainWindow::SlotMusicFront()
     strcpy(buf,QStringToChar(ui->listWidget->currentItem()->text()));
     sprintf(buff,"loadfile \"../MyQT_Mplayer_Project/song/%s\"\n",buf);
     SendMsgToMplayer(buff);
-//    printf("%s\n",buff);
-//    fflush(stdout);
+
     MyCutSong();
     Unlock();
     usleep(500);
     ui->progress_bar->setMaximum(viewinformation.AllTime);
 
 }
+
 void MainWindow::SlotMusicNext()
 {
     if(ui->listWidget->currentRow() == ui->listWidget->count()-1)
@@ -560,14 +576,13 @@ void MainWindow::SlotMusicNext()
     strcpy(buf,QStringToChar(ui->listWidget->currentItem()->text()));
     sprintf(buff,"loadfile \"../MyQT_Mplayer_Project/song/%s\"\n",buf);
     SendMsgToMplayer(buff);
-//    printf("%s\n",buff);
-//    fflush(stdout);
     MyCutSong();
     Unlock();
     usleep(500);
     ui->progress_bar->setMaximum(viewinformation.AllTime);
 
 }
+
 void MainWindow::SlotTimeOut()
 {
 
@@ -575,14 +590,14 @@ void MainWindow::SlotTimeOut()
     PrintInformation();
     if(PuaesFlag == 0)
     {
-//        printf("@@@@@@@@@@@@@@@@@1\n");
+
         fflush(stdout);
        char buff[128];
        sprintf(buff,"volume %d 1\n",viewinformation.hub);
-//       printf("@@@@@@@@@@@@@@@@@2\n");
+
        fflush(stdout);
        SendMsgToMplayer(buff);
-//       printf("@@@@@@@@@@@@@@@@@3\n");
+
        fflush(stdout);
 
     }
@@ -649,29 +664,6 @@ void MainWindow::SlotQPushButtonvolume()
     }
 }
 
-void MainWindow::SlotQGroupBoxMysignalsEnter()
-{
-
-    ui->groupBox->show();
-}
-
-void MainWindow::SlotQGroupBoxMysignalsLeave()
-{
-    ui->groupBox->hide();
-}
-
-//void MainWindow::SlotQWidgetMysignalsEnter()
-//{
-//    ui->widget->show();
-//}
-
-//void MainWindow::SlotQWidgetMysignalsLeave()
-//{
-//    ui->widget->hide();
-//}
-
-
-
 // clicke the pause button
 void MainWindow::SlotMyClickedPlaying()
 {
@@ -697,13 +689,10 @@ void MainWindow::SlotMyDoubleClickedList(QListWidgetItem *item)
             MyCutSong();
             Unlock();
 }
+
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-//    char buff[128] = "";
-//    sprintf(buff,"kill -9 %d",pid);
-//    system(buff);
     SendMsgToMplayer("quit\n");
-
 }
 
 void MainWindow::resizeEvent(QResizeEvent *)
@@ -717,3 +706,15 @@ void MainWindow::resizeEvent(QResizeEvent *)
        this->setPalette(palette);
 }
 
+
+void MainWindow::on_pushButton_clicked()
+{
+   ui->stackedWidget->setCurrentIndex(1);
+   ui->pushButton_3->show();
+}
+
+void MainWindow::on_pushButton_3_clicked()
+{
+    ui->stackedWidget->setCurrentIndex(0);
+    ui->pushButton_3->hide();
+}
