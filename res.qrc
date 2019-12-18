@@ -1,5 +1,9 @@
 <RCC>
     <qresource prefix="/">
         <file>res/img/bg.jpg</file>
+        <file>res/img/aoligei.png</file>
+        <file>res/img/jo.png</file>
+        <file>res/img/gei.png</file>
+        <file>res/img/laoba.png</file>
     </qresource>
 </RCC>

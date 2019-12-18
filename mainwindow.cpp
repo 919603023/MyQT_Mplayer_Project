@@ -48,7 +48,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 
             QTimer *time = new QTimer(this);
-            time->start(500);
+            time->start(50);
             pixmap.load(":/res/img/bg.jpg");
 
             connect(ui->pushButton_showalllyric,SIGNAL(clicked()),this,SLOT(SlotQPushButtonShowAllLyric()));
@@ -125,6 +125,8 @@ void MainWindow::Initialize()
          perror("open wronly fifo");
     }
     OpenFlag = 0;
+
+    imageRotate = 0;
 
     CutSong = 0;
 
@@ -645,6 +647,7 @@ void MainWindow::SlotTimeOut()
        fflush(stdout);
 
     }
+    update();
 
 }
 
@@ -748,6 +751,32 @@ void MainWindow::resizeEvent(QResizeEvent *)
                                 Qt::IgnoreAspectRatio,
                                 Qt::SmoothTransformation)));
        this->setPalette(palette);
+}
+
+void MainWindow::paintEvent(QPaintEvent *)
+{
+    QPainter painter(this);
+    if(PuaesFlag == 0)
+    {
+        disc.load(":/res/img/gei.png");
+
+        /* 碟机转动 */
+        if(imageRotate++ == 360)
+            imageRotate = 0;
+    }
+    else
+    {
+        disc.load(":/res/img/laoba.png");
+    }
+        /* 设定旋转中心点 */
+        painter.translate(130,150);
+        /* 旋转的角度 */
+        painter.rotate(imageRotate);
+        /* 恢复中心点 */
+        painter.translate(-130,-150);
+        /* 画图操作 */
+        painter.drawPixmap(40,60,180,180, disc);
+
 }
 
 

@@ -29,7 +29,7 @@
 #include <iostream>
 #include <QTextCodec>
 #include <QListWidgetItem>
-
+#include <QPainter>
 #include <exception>
 #include <QMenuBar>
 #include <QMenu>
@@ -95,8 +95,8 @@ public:
 
     ~MainWindow();
 
-
-
+    int imageRotate;
+    QPixmap disc;
     int fd;
     char buf[128];
     int OpenFlag;
@@ -142,6 +142,10 @@ public:
     void  closeEvent(QCloseEvent *event);
 
     void  resizeEvent(QResizeEvent *);
+
+  void  paintEvent(QPaintEvent *);
+
+
 
 signals:
 
