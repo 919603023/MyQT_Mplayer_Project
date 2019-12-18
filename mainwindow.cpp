@@ -87,7 +87,11 @@ MainWindow::MainWindow(QWidget *parent)
 //                this->setFixedSize(800,451);
 //                this->setFixedSize(800,450);
 //        }
-         pixmap.load( QFileDialog::getOpenFileName(this,"open","../","JPG(*.jpg)"));
+         QString val = QFileDialog::getOpenFileName(this,"open","../","JPG(*.jpg)");
+         if(val == "")
+         {
+            pixmap.load(":/res/img/bg.jpg");
+         }
          this->setFixedSize(800,451);
          this->setFixedSize(800,450);
 
@@ -242,7 +246,7 @@ void MainWindow::MyCutSong()
             strcpy(buff,buf);
             strcpy(&(buff[strlen(buff)-4]),".lrc");
             sprintf(Site,"../MyQT_Mplayer_Project/lyrics/%s",buff);
-            printf("Site=================%s\n",Site);
+//            printf("Site=================%s\n",Site);
             fflush(stdout);
            FILE *MyFd;
            HaveLyricFlag = 0;
@@ -261,7 +265,7 @@ void MainWindow::MyCutSong()
                 {
                 sscanf(buff1,"[%02d:%02d.%02d]",&val1,&val2,&val3);
                 strcpy(buff,&(buff1[10]));
-                printf("%d----%s\n",val1*60+val2,buff);
+//                printf("%d----%s\n",val1*60+val2,buff);
                 fflush(stdout);
 
 
@@ -313,7 +317,7 @@ QString MainWindow::MyFindLyric()
 if(LyriclistTime.indexOf(viewinformation.NowTime) != -1)
 {
     int a =LyriclistTime.indexOf(viewinformation.NowTime);
-    printf("wo zhao dao la ");
+//    printf("wo zhao dao la ");
     ui->listWidget_2->setCurrentRow(a+2);
     ui->listWidget_2->setCurrentRow(a);
     bzero(MyBuff,sizeof (MyBuff));
@@ -325,8 +329,8 @@ if(LyriclistTime.indexOf(viewinformation.NowTime) != -1)
 
        ui->listWidget_2->item(i)->setTextColor(QColor(0,0,0,255));
     }
-printf("awkfjwlllllllllllll\n");
-fflush(stdout);
+//printf("awkfjwlllllllllllll\n");
+//fflush(stdout);
       ui->listWidget_2->item(a)->setTextColor(QColor(255,0,0,255));
       return LyriclistLyric[a];
 }
@@ -383,7 +387,7 @@ void MainWindow::SetAllLyric()
         ui->listWidget_2->addItem(val);
         val->setTextAlignment(Qt::AlignHCenter);
         val->setFlags(val->flags()&~Qt::ItemIsSelectable);
-         qDebug() << it.i->t();
+//         qDebug() << it.i->t();
         it++;
         }
 #endif
@@ -530,10 +534,10 @@ void *MyGetTimeAndBar(void *arg)
 
                   m->SetTimeQstring(time_pos,m->viewinformation.nowtime);
                   m->viewinformation.NowTime = time_pos;
-                  printf("%d\n",m->viewinformation.NowTime);
-                  fflush(stdout);
-                  printf("%d\n",time_pos);
-                  fflush(stdout);
+//                  printf("%d\n",m->viewinformation.NowTime);
+//                  fflush(stdout);
+//                  printf("%d\n",time_pos);
+//                  fflush(stdout);
             }
             else if(strcmp(cmd,"ANS_META_ALBUM") == 0)
             {

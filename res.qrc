@@ -5,5 +5,7 @@
         <file>res/img/jo.png</file>
         <file>res/img/gei.png</file>
         <file>res/img/laoba.png</file>
+        <file>res/stratvoice/hello_kugo.mp3</file>
+        <file>res/stratvoice/linkstart.mp3</file>
     </qresource>
 </RCC>
