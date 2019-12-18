@@ -244,7 +244,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="MyQPushButton" name="pushButton_volume">
+   <widget class="QPushButton" name="pushButton_volume">
     <property name="geometry">
      <rect>
       <x>670</x>
@@ -280,7 +280,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="MyQGroup" name="groupBox">
+   <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
       <x>670</x>
@@ -292,29 +292,29 @@
     <property name="title">
      <string>GroupBox</string>
     </property>
-   </widget>
-   <widget class="QSpinBox" name="spinBox_huds">
-    <property name="geometry">
-     <rect>
-      <x>730</x>
-      <y>160</y>
-      <width>42</width>
-      <height>26</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QSlider" name="huds">
-    <property name="geometry">
-     <rect>
-      <x>740</x>
-      <y>190</y>
-      <width>16</width>
-      <height>101</height>
-     </rect>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Vertical</enum>
-    </property>
+    <widget class="QSpinBox" name="spinBox_huds">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>30</y>
+       <width>42</width>
+       <height>26</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QSlider" name="huds">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>60</y>
+       <width>16</width>
+       <height>101</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+    </widget>
    </widget>
    <widget class="MyQPushButton" name="pushButton">
     <property name="geometry">

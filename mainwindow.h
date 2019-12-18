@@ -31,13 +31,14 @@
 #include <QListWidgetItem>
 #include "myqpushbutton.h"
 #include "myqgroup.h"
+#include <exception>
 
-typedef   struct
-{
-    int time;
-    int row;
-    char MyLyric[256];
-}lyric;
+//typedef   struct
+//{
+//    int time;
+//    int row;
+//    char MyLyric[256];
+//}lyric;
 struct ViewInformation
 {
     QString song;
@@ -85,11 +86,11 @@ public:
     char MyBuff[128];
     int HaveLyricFlag;
     int SpliderPress;
-    lyric *Lyric[128];
+//    lyric *Lyric[128];
     int ShowAllLyric;
     QString setnowtimeqstring ="";
     ViewInformation viewinformation;
-    lyric StructLyric;
+//    lyric StructLyric;
     QPixmap  pixmap;
     void  closeEvent(QCloseEvent *event);
 

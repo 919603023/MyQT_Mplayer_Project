@@ -33,10 +33,10 @@ QTimer *time = new QTimer(this);
 time->start(500);
  pixmap.load(":/res/img/bg.jpg");
     connect(ui->pushButton_showalllyric,SIGNAL(clicked()),this,SLOT(SlotQPushButtonShowAllLyric()));
-    connect(ui->pushButton_volume,SIGNAL(QPushButonMysignalsEnter()),this,SLOT(SlotQGroupBoxMysignalsEnter()));
-    connect(ui->pushButton_volume,SIGNAL(QPushButonMysignalsLeave()),this,SLOT(SlotQGroupBoxMysignalsLeave()));
-   connect(ui->groupBox,SIGNAL(QGroupMysignalsLeave()),this,SLOT(SlotQGroupBoxMysignalsLeave()));
-    connect(ui->groupBox,SIGNAL(QGroupMysignalsEnter()),this,SLOT(SlotQGroupBoxMysignalsEnter()));
+    connect(ui->pushButton_volume,SIGNAL(clicked()),this,SLOT(SlotQGroupBoxMysignalsEnter()));
+    connect(ui->pushButton_volume,SIGNAL(clicked()),this,SLOT(SlotQGroupBoxMysignalsLeave()));
+//   connect(ui->groupBox,SIGNAL(QGroupMysignalsLeave()),this,SLOT(SlotQGroupBoxMysignalsLeave()));
+//    connect(ui->groupBox,SIGNAL(QGroupMysignalsEnter()),this,SLOT(SlotQGroupBoxMysignalsEnter()));
     connect(ui->pushButton_volume,SIGNAL(clicked()),this,SLOT(SlotQPushButtonvolume()));
     connect(ui->huds, &QSlider::valueChanged, ui->spinBox_huds, &QSpinBox::setValue);
        //当改变选值框的值时，同时进度条也改变位置
@@ -57,7 +57,7 @@ time->start(500);
                 this->setFixedSize(800,450);
         }
     });
-    /*
+ /*
     connect(ui->pushButton,&MyQPushButton::QPushButonMysignalsEnter,[=]{
        ui->groupBox_2->show();
     });
@@ -84,11 +84,11 @@ void MainWindow::Initialize()
 {
      MuteFlag = 0;
 
-    for(int i = 0;i < 128;i++)
-    {
-        lyric *val = new lyric;
-        Lyric[i] = val;
-    }
+//    for(int i = 0;i < 128;i++)
+//    {
+//        lyric *val = new lyric;
+//        Lyric[i] = val;
+//    }
     fd = open("fifo_cmd",O_RDWR);
     if(fd < 0){
          perror("open wronly fifo");
@@ -120,7 +120,7 @@ void MainWindow::Initialize()
     ui->listWidget_2->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     ShowAllLyric = 0;
-    ui->listWidget_2->hide();
+   // ui->listWidget_2->hide();
     ui->groupBox->hide();
 
     bzero(buf,sizeof(buf));
@@ -175,105 +175,84 @@ void MainWindow::ReadDir(char *val)
 void MainWindow::MyCutSong()
 {
 
-   usleep(500);
-//   lyric l;
-//   Lyriclist.push_back(l);
-//  Lyriclist.clear();
-//   for(int i = 0;i < 128;i++)
-//   {
-//       lyric *val = (lyric*)malloc(sizeof (int)+256);
-//       Lyric[i] = val;
-//   }
-//   QList<QString>::iterator it = LyriclistLyric.begin();
+    usleep(500);
 
-//   while(it != LyriclistLyric.end())
-//   {
+    try{
+            LyriclistTime.clear();
 
-//    qDebug() << it.i->t();
-//    delete it.i;
-//   it++;
-//   }
-   LyriclistTime.clear();
-   lyriclistRow.clear();
-   LyriclistLyric.clear();
+            LyriclistLyric.clear();
 
 
-   char buff[128] = "";
-   char Site[128] = "";
-   int val1,val2,val3;
-   char buff1[128];
-    strcpy(buff,buf);
-    strcpy(&(buff[strlen(buff)-4]),".lrc");
-    sprintf(Site,"../MyQT_Mplayer_Project/lyrics/%s",buff);
-   printf("%s\n",Site);
-   fflush(stdout);
-   FILE *MyFd;
-   HaveLyricFlag = 0;
-   for(int a = 0;a < 3;a++)
-   {
+            char buff[128] = "";
+            char Site[128] = "";
+            int val1,val2,val3;
+            char buff1[128];
+            strcpy(buff,buf);
+            strcpy(&(buff[strlen(buff)-4]),".lrc");
+            sprintf(Site,"../MyQT_Mplayer_Project/lyrics/%s",buff);
+            printf("Site=================%s\n",Site);
+            fflush(stdout);
+           FILE *MyFd;
+           // HaveLyricFlag = 0;
+            for(int a = 0;a < 3;a++)
+            {
+                LyriclistTime.push_back(0);
+                LyriclistLyric.push_back("\n");
+             }
+          if( (MyFd = fopen(Site,"r+")) != NULL)
+          {
+            int i = 0;
+            while(fgets(buff1, sizeof(buff1), MyFd) != NULL)
+            {
+
+                if(i > 3)
+                {
+                sscanf(buff1,"[%02d:%02d.%02d]",&val1,&val2,&val3);
+                strcpy(buff,&(buff1[10]));
+                   // sprintf(buff," %s",buff);
+          //      strcpy(&(buff[strlen(buff)-2])," \n\0");
+                printf("%d----%s\n",val1*600+val2*10,buff);
+                fflush(stdout);
 
 
-      LyriclistTime.push_back(0);
-      lyriclistRow.push_back(a);
-      LyriclistLyric.push_back("\n");
-   }
-  if( (MyFd = fopen(Site,"r+")) != NULL){
+                LyriclistTime.push_back(val1*600+val2*10);
 
+                LyriclistLyric.push_back(buff);
 
+                usleep(5000);
+                }
+                 i++;
 
-  int i = 0;
+             }
+       for(int b = 0;b < 6;b++)
+        {
+            LyriclistTime.push_back(0);
+            LyriclistLyric.push_back("\n");
+        }
 
-  while(fgets(buff1, sizeof(buff1), MyFd) != NULL)
-      {
+            HaveLyricFlag = 1;
+            fclose(MyFd);
 
-      if(i > 3)
-      {
+            SetAllLyric();
 
+        }
+        viewinformation.lyric = buf;
 
-     sscanf(buff1,"[%02d:%02d.%02d]",&val1,&val2,&val3);
-      strcpy(buff,&(buff1[10]));
-//      sprintf(buff," %s",buff);
-      strcpy(&(buff[strlen(buff)-1])," \n\0");
+    }
+    catch(std::length_error &e)
+    {
+        lyriclistRow.clear();
+        LyriclistTime.clear();
+        LyriclistLyric.clear();
+        std::cout << e.what() << endl;
 
-//      strcpy(Lyric[i]->MyLyric,buff) ;
-//      Lyric[i]->row = i-1;
-//     Lyric[i]->time = val1*600+val2*10;
-     LyriclistTime.push_back(val1*600+val2*10);
-     lyriclistRow.push_back(i-1);
-     LyriclistLyric.push_back(buff);
+    }
 
-      usleep(5000);
-//       Lyriclist.push_back(Lyric[i]);
-
-
-      }
-      i++;
-      }
-  for(int b = 0;b < 6;b++)
-  {
-
-
-//      Lyric[i+b]->row = i + b;
-//      strcpy(Lyric[i+6]->MyLyric,"\n");
-
-      LyriclistTime.push_back(0);
-      lyriclistRow.push_back(i+b);
-      LyriclistLyric.push_back("\n");
-//      Lyriclist.push_back(Lyric[i+b]);
-
-}
-
-  HaveLyricFlag = 1;
-  fclose(MyFd);
-  viewinformation.lyric = buf;
-  SetAllLyric();
-fclose(MyFd);
-
-return;
+    return;
 }
 #if N
 #endif
-}
+
 
 char* MainWindow::MyFindLyric()
 {
@@ -291,6 +270,7 @@ if(int a =LyriclistTime.indexOf(viewinformation.NowTime) != -1)
 {
     ui->listWidget_2->setCurrentRow(a+5);
     ui->listWidget_2->setCurrentRow(a+3);
+    viewinformation.lyric=LyriclistLyric[a];
     for(int i = 0;i < ui->listWidget_2->count();i++)
    {
 
@@ -301,7 +281,6 @@ if(int a =LyriclistTime.indexOf(viewinformation.NowTime) != -1)
 }
 
 #if 0
-
     std::for_each(LyriclistTime.begin(),LyriclistTime.end(),[=](int val ){
         if(viewinformation.NowTime *10 == val)        {
 
@@ -325,11 +304,21 @@ if(int a =LyriclistTime.indexOf(viewinformation.NowTime) != -1)
 
     return MyBuff;
 }
+
 void MainWindow::SetAllLyric()
 {
     usleep(100*100);
     ui->listWidget_2->clear();
+    if(LyriclistLyric.count()<10)
+    {
 
+    for(int i = 0;i < ui->listWidget_2->count();i++)
+   {
+
+       ui->listWidget_2->item(i-1)->setText("NO_HAVE");
+    }
+    return ;
+    }
 
 #if 1
 
