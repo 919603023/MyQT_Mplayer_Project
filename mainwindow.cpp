@@ -15,6 +15,38 @@ MainWindow::MainWindow(QWidget *parent)
              ui->setupUi(this);
             Initialize();
 
+            QMenuBar *mBar = menuBar();
+             setMenuBar(mBar);
+             QMenu *menu = mBar->addMenu("对话框");
+             QAction *p5 = menu->addAction("文件对话框");
+                connect(p5,&QAction::triggered,[=](){
+
+                    /*打开一个文件，显示内容，显示路径，
+                     * 通过查看getOpenFileName里面的内容，（其实里面已经有写好的例子）
+                     * QFileDialog::getOpenFileName(this,"open","../");会有一个返回值，
+                     * QString path = QFileDialog::getOpenFileName(this,"open","../");
+                     * 如果想打开指定格式的文件怎么写？
+                     * 注意：当想有多种类型的文件打开时，使用两个;;来进行表示
+                     *
+                    */
+                    QString path = QFileDialog::getOpenFileName(this,"open","../","JPG(*.jpg)");
+                    qDebug()<<path;
+                });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             QTimer *time = new QTimer(this);
             time->start(500);
             pixmap.load(":/res/img/bg.jpg");
@@ -49,12 +81,16 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     connect(ui->pushButton_2,&QPushButton::clicked,[=](){
-        if(ui->lineEdit->text() != "")
-        {
-                pixmap.load(ui->lineEdit->text());
-                this->setFixedSize(800,451);
-                this->setFixedSize(800,450);
-        }
+//        if(ui->lineEdit->text() != "")
+//        {
+//                pixmap.load(ui->lineEdit->text());
+//                this->setFixedSize(800,451);
+//                this->setFixedSize(800,450);
+//        }
+         pixmap.load( QFileDialog::getOpenFileName(this,"open","../","JPG(*.jpg)"));
+         this->setFixedSize(800,451);
+         this->setFixedSize(800,450);
+
     });
  /*
     connect(ui->pushButton,&MyQPushButton::QPushButonMysignalsEnter,[=]{

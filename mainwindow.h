@@ -29,9 +29,22 @@
 #include <iostream>
 #include <QTextCodec>
 #include <QListWidgetItem>
-#include "myqpushbutton.h"
-#include "myqgroup.h"
+
 #include <exception>
+#include <QMenuBar>
+#include <QMenu>
+#include <QAction>
+#include <QDialog>
+#include<QDebug>
+#include <QMessageBox>
+#include <QFileDialog>
+#include <QMenuBar>
+#include <QMenu>
+#include <QAction>
+#include <QDialog>
+#include<QDebug>
+#include <QMessageBox>
+#include <QFileDialog>
 
 struct ViewInformation
 {
