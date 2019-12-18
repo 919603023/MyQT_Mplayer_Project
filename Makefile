@@ -643,7 +643,13 @@ compiler_rcc_clean:
 	-$(DEL_FILE) qrc_res.cpp
 qrc_res.cpp: res.qrc \
 		../Qt5.13.2/5.13.2/gcc_64/bin/rcc \
-		res/img/bg.jpg
+		res/stratvoice/linkstart.mp3 \
+		res/stratvoice/hello_kugo.mp3 \
+		res/img/gei.png \
+		res/img/bg.jpg \
+		res/img/aoligei.png \
+		res/img/jo.png \
+		res/img/laoba.png
 	/home/wgb/Qt5.13.2/5.13.2/gcc_64/bin/rcc -name res res.qrc -o qrc_res.cpp
 
 compiler_moc_predefs_make_all: moc_predefs.h
@@ -790,6 +796,10 @@ moc_mainwindow.cpp: mainwindow.h \
 		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/qstyle.h \
 		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/qtabbar.h \
 		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/qrubberband.h \
+		../Qt5.13.2/5.13.2/gcc_64/include/QtGui/QPainter \
+		../Qt5.13.2/5.13.2/gcc_64/include/QtGui/qpainter.h \
+		../Qt5.13.2/5.13.2/gcc_64/include/QtGui/qtextoption.h \
+		../Qt5.13.2/5.13.2/gcc_64/include/QtGui/qpen.h \
 		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/QMenuBar \
 		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/qmenubar.h \
 		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/qmenu.h \
@@ -965,6 +975,10 @@ main.o: main.cpp mainwindow.h \
 		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/qstyle.h \
 		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/qtabbar.h \
 		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/qrubberband.h \
+		../Qt5.13.2/5.13.2/gcc_64/include/QtGui/QPainter \
+		../Qt5.13.2/5.13.2/gcc_64/include/QtGui/qpainter.h \
+		../Qt5.13.2/5.13.2/gcc_64/include/QtGui/qtextoption.h \
+		../Qt5.13.2/5.13.2/gcc_64/include/QtGui/qpen.h \
 		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/QMenuBar \
 		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/qmenubar.h \
 		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/qmenu.h \
@@ -1124,6 +1138,10 @@ mainwindow.o: mainwindow.cpp mainwindow.h \
 		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/qstyle.h \
 		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/qtabbar.h \
 		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/qrubberband.h \
+		../Qt5.13.2/5.13.2/gcc_64/include/QtGui/QPainter \
+		../Qt5.13.2/5.13.2/gcc_64/include/QtGui/qpainter.h \
+		../Qt5.13.2/5.13.2/gcc_64/include/QtGui/qtextoption.h \
+		../Qt5.13.2/5.13.2/gcc_64/include/QtGui/qpen.h \
 		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/QMenuBar \
 		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/qmenubar.h \
 		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/qmenu.h \
@@ -1139,41 +1157,7 @@ mainwindow.o: mainwindow.cpp mainwindow.h \
 		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/qfiledialog.h \
 		../Qt5.13.2/5.13.2/gcc_64/include/QtCore/qdir.h \
 		../Qt5.13.2/5.13.2/gcc_64/include/QtCore/qfileinfo.h \
-		ui_mainwindow.h \
-		../Qt5.13.2/5.13.2/gcc_64/include/QtCore/QVariant \
-		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/QApplication \
-		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/qapplication.h \
-		../Qt5.13.2/5.13.2/gcc_64/include/QtCore/qcoreapplication.h \
-		../Qt5.13.2/5.13.2/gcc_64/include/QtCore/qeventloop.h \
-		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/qdesktopwidget.h \
-		../Qt5.13.2/5.13.2/gcc_64/include/QtGui/qguiapplication.h \
-		../Qt5.13.2/5.13.2/gcc_64/include/QtGui/qinputmethod.h \
-		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/QGroupBox \
-		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/qgroupbox.h \
-		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/QHBoxLayout \
-		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/qboxlayout.h \
-		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/qlayout.h \
-		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/qlayoutitem.h \
-		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/qgridlayout.h \
-		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/QLabel \
-		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/qlabel.h \
-		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/QLineEdit \
-		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/qlineedit.h \
-		../Qt5.13.2/5.13.2/gcc_64/include/QtGui/qtextcursor.h \
-		../Qt5.13.2/5.13.2/gcc_64/include/QtGui/qtextformat.h \
-		../Qt5.13.2/5.13.2/gcc_64/include/QtGui/qpen.h \
-		../Qt5.13.2/5.13.2/gcc_64/include/QtGui/qtextoption.h \
-		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/QListWidget \
-		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/QPushButton \
-		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/qpushbutton.h \
-		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/qabstractbutton.h \
-		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/QSlider \
-		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/QSpacerItem \
-		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/QSpinBox \
-		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/qspinbox.h \
-		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/QStackedWidget \
-		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/qstackedwidget.h \
-		../Qt5.13.2/5.13.2/gcc_64/include/QtWidgets/QWidget
+		ui_mainwindow.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o mainwindow.cpp
 
 qrc_res.o: qrc_res.cpp 

@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
                     " mplayer ",
                     "-slave", "-quiet","-idle",
                     "-input", "file=./fifo_cmd",
-                    "/home/wgb/MyQT_Mplayer_Project/res/stratvoice/hello_kugo.mp3", NULL);
+                    "./res/stratvoice/hello_kugo.mp3", NULL);
     }
     else{
         QApplication a(argc, argv);
