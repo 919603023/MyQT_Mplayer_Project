@@ -15,23 +15,23 @@ MainWindow::MainWindow(QWidget *parent)
              ui->setupUi(this);
             Initialize();
 
-            QMenuBar *mBar = menuBar();
-             setMenuBar(mBar);
-             QMenu *menu = mBar->addMenu("对话框");
-             QAction *p5 = menu->addAction("文件对话框");
-                connect(p5,&QAction::triggered,[=](){
+//            QMenuBar *mBar = menuBar();
+//             setMenuBar(mBar);
+//             QMenu *menu = mBar->addMenu("对话框");
+//             QAction *p5 = menu->addAction("文件对话框");
+//                connect(p5,&QAction::triggered,[=](){
 
-                    /*打开一个文件，显示内容，显示路径，
-                     * 通过查看getOpenFileName里面的内容，（其实里面已经有写好的例子）
-                     * QFileDialog::getOpenFileName(this,"open","../");会有一个返回值，
-                     * QString path = QFileDialog::getOpenFileName(this,"open","../");
-                     * 如果想打开指定格式的文件怎么写？
-                     * 注意：当想有多种类型的文件打开时，使用两个;;来进行表示
-                     *
-                    */
-                    QString path = QFileDialog::getOpenFileName(this,"open","../","JPG(*.jpg)");
-                    qDebug()<<path;
-                });
+//                    /*打开一个文件，显示内容，显示路径，
+//                     * 通过查看getOpenFileName里面的内容，（其实里面已经有写好的例子）
+//                     * QFileDialog::getOpenFileName(this,"open","../");会有一个返回值，
+//                     * QString path = QFileDialog::getOpenFileName(this,"open","../");
+//                     * 如果想打开指定格式的文件怎么写？
+//                     * 注意：当想有多种类型的文件打开时，使用两个;;来进行表示
+//                     *
+//                    */
+//                    QString path = QFileDialog::getOpenFileName(this,"open","../","JPG(*.jpg)");
+//                    qDebug()<<path;
+//                });
 
 
 
@@ -227,7 +227,7 @@ void MainWindow::MyCutSong()
 
     usleep(500);
 
-    try{
+
             LyriclistTime.clear();
 
             LyriclistLyric.clear();
@@ -243,7 +243,7 @@ void MainWindow::MyCutSong()
             printf("Site=================%s\n",Site);
             fflush(stdout);
            FILE *MyFd;
-           // HaveLyricFlag = 0;
+           HaveLyricFlag = 0;
             for(int a = 0;a < 3;a++)
             {
                 LyriclistTime.push_back(0);
@@ -259,11 +259,11 @@ void MainWindow::MyCutSong()
                 {
                 sscanf(buff1,"[%02d:%02d.%02d]",&val1,&val2,&val3);
                 strcpy(buff,&(buff1[10]));
-                printf("%d----%s\n",val1*600+val2*10,buff);
+                printf("%d----%s\n",val1*60+val2,buff);
                 fflush(stdout);
 
 
-                LyriclistTime.push_back(val1*600+val2*10);
+                LyriclistTime.push_back(val1*60+val2);
 
                 LyriclistLyric.push_back(buff);
 
@@ -284,45 +284,49 @@ void MainWindow::MyCutSong()
             SetAllLyric();
 
         }
+        else
+        {
+
+              LyriclistTime.clear();
+              LyriclistLyric.clear();
+        }
         viewinformation.lyric = buf;
-
-    }
-    catch(std::length_error &e)
-    {
-        lyriclistRow.clear();
-        LyriclistTime.clear();
-        LyriclistLyric.clear();
-        std::cout << e.what() << endl;
-
-    }
-
     return;
 }
 
-char* MainWindow::MyFindLyric()
+QString MainWindow::MyFindLyric()
 {
-    strcpy(MyBuff,"__nohave");
-    bzero(MyBuff,sizeof (MyBuff));
+
 
 
     if(LyriclistLyric.count()<10)
     {
-        return "NO_HAVE_LYRIC";
+
+        strcpy(MyBuff,"__nohave");
+
+        return "__nohave";
     }
     usleep(5000);
 
-if(int a =LyriclistTime.indexOf(viewinformation.NowTime) != -1)
+if(LyriclistTime.indexOf(viewinformation.NowTime) != -1)
 {
-    ui->listWidget_2->setCurrentRow(a+5);
-    ui->listWidget_2->setCurrentRow(a+3);
-    viewinformation.lyric=LyriclistLyric[a];
+    int a =LyriclistTime.indexOf(viewinformation.NowTime);
+    printf("wo zhao dao la ");
+    ui->listWidget_2->setCurrentRow(a+2);
+    ui->listWidget_2->setCurrentRow(a);
+    bzero(MyBuff,sizeof (MyBuff));
+    QByteArray ba = LyriclistLyric[a].toUtf8(); // must
+    strcpy(MyBuff,ba.data());
+
     for(int i = 0;i < ui->listWidget_2->count();i++)
    {
 
        ui->listWidget_2->item(i)->setTextColor(QColor(0,0,0,255));
     }
-
-      ui->listWidget_2->item(a+3)->setTextColor(QColor(255,0,0,255));
+printf("awkfjwlllllllllllll\n");
+fflush(stdout);
+      ui->listWidget_2->item(a)->setTextColor(QColor(255,0,0,255));
+      return LyriclistLyric[a];
 }
 
 #if 0
@@ -359,7 +363,7 @@ void MainWindow::SetAllLyric()
     {
 
     for(int i = 0;i < ui->listWidget_2->count();i++)
-   {
+    {
 
        ui->listWidget_2->item(i-1)->setText("NO_HAVE");
     }
@@ -389,11 +393,11 @@ void MainWindow::SetInformation()
     viewinformation.song = buf;
     if(HaveLyricFlag == 1)
     {
-        if(strcmp(MyFindLyric(), "__nohave") != 0)
+        if(MyFindLyric() != "__nohave")
         {
 
            viewinformation.lyric= MyFindLyric();
-      }
+        }
     }
     else
     {
@@ -519,11 +523,15 @@ void *MyGetTimeAndBar(void *arg)
             }
              else if(strcmp(cmd,"ANS_TIME_POSITION") == 0)//当前时间
             {
-                 float time_pos = 0;
-                  sscanf(buf,"%*[^=]=%f", &time_pos);
+                 int time_pos = 0;
+                  sscanf(buf,"%*[^=]=%d", &time_pos);
 
                   m->SetTimeQstring(time_pos,m->viewinformation.nowtime);
                   m->viewinformation.NowTime = time_pos;
+                  printf("%d\n",m->viewinformation.NowTime);
+                  fflush(stdout);
+                  printf("%d\n",time_pos);
+                  fflush(stdout);
             }
             else if(strcmp(cmd,"ANS_META_ALBUM") == 0)
             {

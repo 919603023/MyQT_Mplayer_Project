@@ -120,7 +120,7 @@ public:
 
     void MyCutSong();
 
-    char*MyFindLyric();
+    QString MyFindLyric();
 
     void ReadDir(char *val);
 
