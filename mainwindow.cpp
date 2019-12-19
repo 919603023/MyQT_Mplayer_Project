@@ -84,6 +84,10 @@ MainWindow::MainWindow(QWidget *parent)
          {
             pixmap.load(":/res/img/bg.jpg");
          }
+         else
+            {
+             pixmap.load(val);
+         }
          this->setFixedSize(800,451);
          this->setFixedSize(800,450);
 
@@ -455,7 +459,11 @@ void MainWindow::CutSong(char *val)
 
     GetLyric();
     Unlock();
-    usleep(500);
+
+    Lock();
+    viewinformation.NowTime = 0;
+    usleep(2300000);
+    Unlock();
     ui->progress_bar->setMaximum(viewinformation.AllTime);
 }
 
